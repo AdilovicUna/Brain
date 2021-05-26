@@ -17,7 +17,9 @@ namespace Brain
             Application.SetHighDpiMode(HighDpiMode.SystemAware);
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1());
+            Form1 f = new Form1();
+            f.Text = "Brain";
+            Application.Run(f);
         }
     }
 }
