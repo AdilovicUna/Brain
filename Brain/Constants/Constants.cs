@@ -34,12 +34,12 @@ namespace Constants
         public static Color StatisticsColor() => Color.PaleVioletRed;
         public static Color MainMenuColor() => Color.Plum;
         public static Brush WindowBrush() => Brushes.Thistle;
-        public static Point UsernameBoxPos() => new Point((Const.WindowWidth / 2) - (Const.UsernameWidth/2), (Const.WindowHeight / 2) - (Const.UsernameHeight/2) - 130);
+        public static Point UsernameBoxPos() => new Point((Const.WindowWidth / 2) - (Const.UsernameWidth/2), (Const.WindowHeight / 2) - (Const.UsernameHeight/2) - 200);
         public static Size UsernameSize() => new Size(Const.UsernameWidth, Const.UsernameHeight);
         public static Brush UsernameBoxBrush() => Brushes.Lavender;
         public static Color UsernameButtonColor() => Color.PaleVioletRed;
-        public static Point NewUserButtonPos() => new Point((Const.WindowWidth / 2) - (Const.UsernameWidth / 2), (Const.WindowHeight / 2) - (Const.UsernameHeight / 2));
-        public static Point ExsistingUserButtonPos() => new Point((Const.WindowWidth / 2) - (Const.UsernameWidth / 2), (Const.WindowHeight / 2) - (Const.UsernameHeight / 2) + 150);
+        public static Point NewUserButtonPos() => new Point((Const.WindowWidth / 2) - (Const.UsernameWidth / 2), (Const.WindowHeight / 2) - (Const.UsernameHeight / 2) - 80);
+        public static Point ExsistingUserButtonPos() => new Point((Const.WindowWidth / 2) - (Const.UsernameWidth / 2), (Const.WindowHeight / 2) - (Const.UsernameHeight / 2) + 75);
         public static Point PlayButton() => new Point(1150, 700);
         public static Point Game1() => new Point(100, 150);
         public static Point Game2() => new Point(100, 400);

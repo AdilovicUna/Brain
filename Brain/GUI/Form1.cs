@@ -112,6 +112,7 @@ namespace Brain
             Typing.Click += new EventHandler(OnPlayClick);
             this.Controls.Add(Typing);
             PlayClicked = true;
+            CloseUsernameBoX();
             Invalidate();
         }
         #endregion
