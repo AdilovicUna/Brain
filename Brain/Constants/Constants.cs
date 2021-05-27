@@ -27,10 +27,12 @@ namespace Constants
     public static class MConst
     {
         public static Color WindowColor() => Color.Thistle;
-        public static Color MemoryColor() => Color.Yellow;
-        public static Color ProblemSolvingColor() => Color.Green;
-        public static Color FocusColor() => Color.Blue;
-        public static Color LanguageColor() => Color.Orange;
+        public static Color MemoryColor() => Color.PaleGoldenrod;
+        public static Color ProblemSolvingColor() => Color.PaleGreen;
+        public static Color FocusColor() => Color.PowderBlue;
+        public static Color LanguageColor() => Color.NavajoWhite;
+        public static Color StatisticsColor() => Color.PaleVioletRed;
+        public static Color MainMenuColor() => Color.Plum;
         public static Brush WindowBrush() => Brushes.Thistle;
         public static Point UsernameBoxPos() => new Point((Const.WindowWidth / 2) - (Const.UsernameWidth/2), (Const.WindowHeight / 2) - (Const.UsernameHeight/2) - 130);
         public static Size UsernameSize() => new Size(Const.UsernameWidth, Const.UsernameHeight);

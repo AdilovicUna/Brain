@@ -76,39 +76,39 @@ namespace Brain
             this.Controls.Remove(ExistingUser);
             this.Controls.Remove(Play);
             //create Statistics button
-            Statistics = CreateButton("Statistics", MConst.Statistics(), Const.StatisticsWidth, Const.StatisticsHeight, MConst.WindowColor(), MConst.UsernameButtonColor(), MConst.PlayFont());
+            Statistics = CreateButton("Statistics", MConst.Statistics(), Const.StatisticsWidth, Const.StatisticsHeight, MConst.WindowColor(), MConst.StatisticsColor(), MConst.PlayFont());
             Statistics.Click += new EventHandler(OnPlayClick);
             this.Controls.Add(Statistics);
             //create Path finding button
-            PathFinding = CreateButton("Path Finding", MConst.Game1(), Const.GameSquareWidth, Const.GameSquareHeight, MConst.WindowColor(), MConst.MemoryColor(), MConst.PlayFont());
+            PathFinding = CreateButton("Path Finding", MConst.Game1(), Const.GameSquareWidth, Const.GameSquareHeight, MConst.MainMenuColor(), MConst.MemoryColor(), MConst.PlayFont());
             PathFinding.Click += new EventHandler(OnPlayClick);
             this.Controls.Add(PathFinding);
             //create Partial match button
-            PartialMatch = CreateButton("Partial Match", MConst.Game2(), Const.GameSquareWidth, Const.GameSquareHeight, MConst.WindowColor(), MConst.MemoryColor(), MConst.PlayFont());
+            PartialMatch = CreateButton("Partial Match", MConst.Game2(), Const.GameSquareWidth, Const.GameSquareHeight, MConst.MainMenuColor(), MConst.MemoryColor(), MConst.PlayFont());
             PartialMatch.Click += new EventHandler(OnPlayClick);
             this.Controls.Add(PartialMatch);
             //create Nanogram button
-            Nanogram = CreateButton("Nanogram", MConst.Game3(), Const.GameSquareWidth, Const.GameSquareHeight, MConst.WindowColor(), MConst.ProblemSolvingColor(), MConst.PlayFont());
+            Nanogram = CreateButton("Nanogram", MConst.Game3(), Const.GameSquareWidth, Const.GameSquareHeight, MConst.MainMenuColor(), MConst.ProblemSolvingColor(), MConst.PlayFont());
             Nanogram.Click += new EventHandler(OnPlayClick);
             this.Controls.Add(Nanogram);
             //create Low to High button
-            LowToHigh = CreateButton("Low To High", MConst.Game4(), Const.GameSquareWidth, Const.GameSquareHeight, MConst.WindowColor(), MConst.ProblemSolvingColor(), MConst.PlayFont());
+            LowToHigh = CreateButton("Low To High", MConst.Game4(), Const.GameSquareWidth, Const.GameSquareHeight, MConst.MainMenuColor(), MConst.ProblemSolvingColor(), MConst.PlayFont());
             LowToHigh.Click += new EventHandler(OnPlayClick);
             this.Controls.Add(LowToHigh);
             //create Sort button
-            Sort = CreateButton("Sort", MConst.Game5(), Const.GameSquareWidth, Const.GameSquareHeight, MConst.WindowColor(), MConst.FocusColor(), MConst.PlayFont());
+            Sort = CreateButton("Sort", MConst.Game5(), Const.GameSquareWidth, Const.GameSquareHeight, MConst.MainMenuColor(), MConst.FocusColor(), MConst.PlayFont());
             Sort.Click += new EventHandler(OnPlayClick);
             this.Controls.Add(Sort);
             //create Color read button
-            ColorRead = CreateButton("Color Read", MConst.Game6(), Const.GameSquareWidth, Const.GameSquareHeight, MConst.WindowColor(), MConst.FocusColor(), MConst.PlayFont());
+            ColorRead = CreateButton("Color Read", MConst.Game6(), Const.GameSquareWidth, Const.GameSquareHeight, MConst.MainMenuColor(), MConst.FocusColor(), MConst.PlayFont());
             ColorRead.Click += new EventHandler(OnPlayClick);
             this.Controls.Add(ColorRead);
             //create Word hunt button
-            WordHunt = CreateButton("Word Hunt", MConst.Game7(), Const.GameSquareWidth, Const.GameSquareHeight, MConst.WindowColor(), MConst.LanguageColor(), MConst.PlayFont());
+            WordHunt = CreateButton("Word Hunt", MConst.Game7(), Const.GameSquareWidth, Const.GameSquareHeight, MConst.MainMenuColor(), MConst.LanguageColor(), MConst.PlayFont());
             WordHunt.Click += new EventHandler(OnPlayClick);
             this.Controls.Add(WordHunt);
             //create Typing button
-            Typing = CreateButton("Typing", MConst.Game8(), Const.GameSquareWidth, Const.GameSquareHeight, MConst.WindowColor(), MConst.LanguageColor(), MConst.PlayFont());
+            Typing = CreateButton("Typing", MConst.Game8(), Const.GameSquareWidth, Const.GameSquareHeight, MConst.MainMenuColor(), MConst.LanguageColor(), MConst.PlayFont());
             Typing.Click += new EventHandler(OnPlayClick);
             this.Controls.Add(Typing);
             PlayClicked = true;
