@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
-using Constants;
+using ViewConstants;
 using System.IO;
 
 namespace Brain
@@ -134,7 +134,7 @@ namespace Brain
             CheckIfUsernameBoxClicked(e, MConst.UsernameBoxPos());
         }
         #endregion
-        #region Text Box
+        #region Username TextBox
         // open and close username box
         TextBox editBox;
         void OpenUsernameBox()

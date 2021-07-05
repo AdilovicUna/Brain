@@ -1,10 +1,11 @@
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace Constants
+namespace ViewConstants
 {
     public static class Const
     {
+        #region Main Menu
         public const int WindowWidth = 1500;
         public const int WindowHeight = 900;
 
@@ -22,10 +23,12 @@ namespace Constants
 
         public const int StatisticsWidth = 300;
         public const int StatisticsHeight = 150;
+        #endregion
     }
 
     public static class MConst
     {
+        #region Main Menu
         public static Color WindowColor() => Color.Thistle;
         public static Color MemoryColor() => Color.PaleGoldenrod;
         public static Color ProblemSolvingColor() => Color.PaleGreen;
@@ -53,5 +56,6 @@ namespace Constants
         public static Font PlayFont() => new Font("Times New Roman", 20);
         public static Font Font() => new Font("Times New Roman", 30);
         public static Pen Pen() => new Pen(Color.Black, 1);
+        #endregion
     }
 }
