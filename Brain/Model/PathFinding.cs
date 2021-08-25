@@ -3,12 +3,12 @@ using System.Collections.Generic;
 
 public class MyPoint // named like this because it overlapped with a class Point used in Form1.cs
 {
-    public int x { get; set; }
-    public int y { get; set; }
+    public int X { get; set; }
+    public int Y { get; set; }
     public MyPoint(int x1, int y1)
     {
-        x = x1;
-        y = y1;
+        X = x1;
+        Y = y1;
     }
 
     public override bool Equals(object obj)
@@ -17,12 +17,12 @@ public class MyPoint // named like this because it overlapped with a class Point
         {
             return false;
         }
-        return (x == ((MyPoint)obj).x) && (y == ((MyPoint)obj).y);
+        return (X == ((MyPoint)obj).X) && (Y == ((MyPoint)obj).Y);
     }
 
     public override int GetHashCode()
     {
-        return x.GetHashCode() ^ y.GetHashCode();
+        return X.GetHashCode() ^ Y.GetHashCode();
     }
 }
 
@@ -36,7 +36,7 @@ public class Graph
 public class Game1
 {
     public Graph graph;
-    private int gridSize;
+    private readonly int gridSize;
 
     public Game1(int size)
     {
@@ -44,31 +44,33 @@ public class Game1
 
         Random r = new Random();
 
-        Graph g = constructGrid(size, r);
+        Graph g = ConstructGrid(size, r);
 
         // keep generating grids until one of them has at least 3 paths from the starting to ending points
-        while (!existMinThreePaths(g))
+        while (!ExistMinThreePaths(g))
         {
-            g = constructGrid(size, r);
+            g = ConstructGrid(size, r);
         }
         this.graph = g;
     }
 
-    public Graph constructGrid(int size, Random r)
+    public Graph ConstructGrid(int size, Random r)
     {
-        Graph g = new Graph();
+        Graph g = new Graph
+        {
 
-        // 0 on the grid represent empty spots, 1 represents a mine, 2 represent start and end.
-        // the path can be drawn from start to end or vice versa, so there is no reason to differentiate their numerical values on the grid
+            // 0 on the grid represent empty spots, 1 represents a mine, 2 represent start and end.
+            // the path can be drawn from start to end or vice versa, so there is no reason to differentiate their numerical values on the grid
 
-        g.grid = new int[size][];
-        g.start = new MyPoint(r.Next(0, size), r.Next(0, size));
-        g.end = new MyPoint(r.Next(0, size), r.Next(0, size));
+            grid = new int[size][],
+            start = new MyPoint(r.Next(0, size), r.Next(0, size)),
+            end = new MyPoint(r.Next(0, size), r.Next(0, size))
+        };
 
         // make sure that there is at least 1 spot between start and end in any direction
-        while (Math.Abs(g.start.x - g.end.x) < 1 && Math.Abs(g.start.y - g.end.y) < 1)
+        while (Math.Abs(g.start.X - g.end.X) < 1 && Math.Abs(g.start.Y - g.end.Y) < 1)
         {
-            (g.end.x, g.end.y) = (r.Next(0, size), r.Next(0, size));
+            (g.end.X, g.end.Y) = (r.Next(0, size), r.Next(0, size));
         }
 
         // place mines (every spot has 30% chance of being a mine)
@@ -90,13 +92,13 @@ public class Game1
             }
         }
         //place start and end
-        g.grid[g.start.x][g.start.y] = 2;
-        g.grid[g.end.x][g.end.y] = 2;
+        g.grid[g.start.X][g.start.Y] = 2;
+        g.grid[g.end.X][g.end.Y] = 2;
 
         return g;
     }
 
-    public bool existMinThreePaths(Graph g)
+    public bool ExistMinThreePaths(Graph g)
     {
         // run DFS and count how many paths are there
         int numberOfPaths = DFS(g.start, g.end, g, new List<MyPoint>(), new List<MyPoint>(), 0);
@@ -117,7 +119,7 @@ public class Game1
         }
 
         // loop through every neighbour of the current starting node
-        List<MyPoint> n = findNeighbours(start, g); 
+        List<MyPoint> n = FindNeighbours(start, g); 
         foreach (MyPoint entry in n)
         {
             // skip if this node is already on the path
@@ -137,17 +139,17 @@ public class Game1
         return numberOfPaths;
     }
 
-    public bool isWall(MyPoint p, Graph g)
+    public bool IsWall(MyPoint p, Graph g)
     {
         // walls are marked with a number 1
-        if (g.grid[p.x][p.y] == 1)
+        if (g.grid[p.X][p.Y] == 1)
         {
             return true;
         }
         return false;
     }
 
-    public bool isStart(MyPoint p, Graph g)
+    public bool IsStart(MyPoint p, Graph g)
     {
         // Equals function is called instead of == 
         // otherwise it will return true if p and g.start have the same reference (which they don't)
@@ -157,7 +159,7 @@ public class Game1
         }
         return false;
     }
-    public List<MyPoint> findNeighbours(MyPoint p, Graph g)
+    public List<MyPoint> FindNeighbours(MyPoint p, Graph g)
     {
         // diagonal movement is not allowed
         int[] directionX = { -1, 1, 0, 0 };
@@ -166,12 +168,12 @@ public class Game1
         List<MyPoint> neighbours = new List<MyPoint>();
         for (int i = 0; i < 4; i++)
         {
-            MyPoint maybeNeighbour = new MyPoint(p.x + directionX[i], p.y + directionY[i]);
+            MyPoint maybeNeighbour = new MyPoint(p.X + directionX[i], p.Y + directionY[i]);
             // check if there are any walls in the left, right, up and down direction from p
             // also check if p is a starting point, or if the maybeNeighbour is out of bounds of the grid
-            if (maybeNeighbour.x < gridSize && maybeNeighbour.y < gridSize &&
-                maybeNeighbour.x >= 0 && maybeNeighbour.y >= 0 &&
-                !isWall(maybeNeighbour, g) && !isStart(maybeNeighbour, g))
+            if (maybeNeighbour.X < gridSize && maybeNeighbour.Y < gridSize &&
+                maybeNeighbour.X >= 0 && maybeNeighbour.Y >= 0 &&
+                !IsWall(maybeNeighbour, g) && !IsStart(maybeNeighbour, g))
             {
                 neighbours.Add(maybeNeighbour);
             }

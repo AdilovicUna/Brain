@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using ViewConstants;
-using System.IO;
 
 namespace Brain
 {
@@ -139,8 +138,10 @@ namespace Brain
         TextBox editBox;
         void OpenUsernameBox()
         {
-            editBox = new TextBox();
-            editBox.Font = MConst.Font();
+            editBox = new TextBox
+            {
+                Font = MConst.Font()
+            };
             Point p = MConst.UsernameBoxPos();
             editBox.SetBounds(p.X, p.Y, Const.UsernameWidth, Const.UsernameHeight);
             editBox.Multiline = true;
