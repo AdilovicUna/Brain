@@ -36,7 +36,7 @@ public class Graph
 public class Game1
 {
     public Graph graph;
-    private readonly int gridSize;
+    public readonly int gridSize;
 
     public Game1(int size)
     {
@@ -56,19 +56,17 @@ public class Game1
 
     public Graph ConstructGrid(int size, Random r)
     {
-        Graph g = new Graph
-        {
+        Graph g = new Graph();
 
-            // 0 on the grid represent empty spots, 1 represents a mine, 2 represent start and end.
-            // the path can be drawn from start to end or vice versa, so there is no reason to differentiate their numerical values on the grid
+        // 0 on the grid represent empty spots, 1 represents a mine, 2 represent start and end.
+        // the path can be drawn from start to end or vice versa, so there is no reason to differentiate their numerical values on the grid
 
-            grid = new int[size][],
-            start = new MyPoint(r.Next(0, size), r.Next(0, size)),
-            end = new MyPoint(r.Next(0, size), r.Next(0, size))
-        };
+        g.grid = new int[size][];
+        g.start = new MyPoint(r.Next(0, size), r.Next(0, size));
+        g.end = new MyPoint(r.Next(0, size), r.Next(0, size));
 
         // make sure that there is at least 1 spot between start and end in any direction
-        while (Math.Abs(g.start.X - g.end.X) < 1 && Math.Abs(g.start.Y - g.end.Y) < 1)
+        while (Math.Abs(g.start.X - g.end.X) < 2 && Math.Abs(g.start.Y - g.end.Y) < 2)
         {
             (g.end.X, g.end.Y) = (r.Next(0, size), r.Next(0, size));
         }
