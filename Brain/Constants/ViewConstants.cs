@@ -5,6 +5,18 @@ namespace ViewConstants
     public static class Const
     {
         #region Main Menu
+        public const int FirstWindow = -1;
+        public const int MainMenu = 0;
+        public const int PathFinding = 1;
+        public const int PartialMatch = 2;
+        public const int Nanogram = 3;
+        public const int FromLowToHigh =4;
+        public const int Sort = 5;
+        public const int ColorRead = 6;
+        public const int WordHunt = 7;
+        public const int Typing = 8;
+        public const int Statistics = 9;
+
         public const int WindowWidth = 1500;
         public const int WindowHeight = 900;
 
@@ -55,6 +67,7 @@ namespace ViewConstants
         public static Font PlayFont() => new Font("Times New Roman", 20);
         public static Font Font() => new Font("Times New Roman", 30);
         public static Pen Pen() => new Pen(Color.Black, 1);
+        public static Pen Pen2() => new Pen(Color.Black, 2);
         #endregion
     }
 }

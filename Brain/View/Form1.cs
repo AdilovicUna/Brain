@@ -23,11 +23,29 @@ namespace Brain
         Button WordHunt;
         Button Typing;
         #endregion
+
+        #region General global variables
         Point Center = new Point
         {
             X = Const.WindowWidth / 2,
             Y = Const.WindowHeight / 2
         };
+        int currentGame = Const.FirstWindow;
+        bool newUser = false;
+        #endregion
+
+        #region Path Finding global variables
+        Game1 game = new Game1(6);
+        Point pfUpperLeft;
+        int drawnGridSize;
+        readonly int oneSquareSize = 70;
+        MyPoint square;
+        bool addSquare = false;
+        bool wallsHidden = false;
+        List<MyPoint> userPath;
+        List<MyPoint> wallsHit;
+        int numOfPuzzlesPlayed = 0;
+        #endregion
         public Form1()
         {
             InitializeComponent();
@@ -35,11 +53,11 @@ namespace Brain
             BackColor = MConst.WindowColor();
 
             //create new username button
-            NewUser = CreateButton("New User", MConst.NewUserButtonPos(), Const.UsernameButtonWidth, Const.UsernameButtonHeight, MConst.WindowColor(), MConst.UsernameButtonColor(), MConst.Font());
+            NewUser = CreateButton("New newUser", MConst.NewUserButtonPos(), Const.UsernameButtonWidth, Const.UsernameButtonHeight, MConst.WindowColor(), MConst.UsernameButtonColor(), MConst.Font());
             NewUser.Click += new EventHandler(OnNewUserClick);
             Controls.Add(NewUser);
             //create existing username button
-            ExistingUser = CreateButton("Existing User", MConst.ExsistingUserButtonPos(), Const.UsernameButtonWidth, Const.UsernameButtonHeight, MConst.WindowColor(), MConst.UsernameButtonColor(), MConst.Font());
+            ExistingUser = CreateButton("Existing newUser", MConst.ExsistingUserButtonPos(), Const.UsernameButtonWidth, Const.UsernameButtonHeight, MConst.WindowColor(), MConst.UsernameButtonColor(), MConst.Font());
             ExistingUser.Click += new EventHandler(OnExsitingUserClick);
             Controls.Add(ExistingUser);
             Play = CreateButton("Play", MConst.PlayButton(), Const.PlayButtonWidth, Const.PlayButtonHeight, MConst.WindowColor(), MConst.UsernameButtonColor(), MConst.Font());
@@ -62,18 +80,14 @@ namespace Brain
             button.Font = font;
             return button;
         }
-
-        bool User = false;
-        bool PlayClicked = false;
-        bool PathFindingClicked = false;
         public void OnNewUserClick(object sender, EventArgs args)
         {
-            User = true;
+            newUser = true;
             Invalidate();
         }
         public void OnExsitingUserClick(object sender, EventArgs args)
         {
-            User = false;
+            newUser = false;
             Invalidate();
         }
 
@@ -118,7 +132,7 @@ namespace Brain
             Typing = CreateButton("Typing", MConst.Game8(), Const.GameSquareWidth, Const.GameSquareHeight, MConst.MainMenuColor(), MConst.LanguageColor(), MConst.PlayFont());
             Typing.Click += new EventHandler(OnPlayClick);
             Controls.Add(Typing);
-            PlayClicked = true;
+            currentGame = Const.MainMenu;
             CloseUsernameBoX();
             Invalidate();
         }
@@ -126,7 +140,7 @@ namespace Brain
         public void OnPathFindingClick(object sender, EventArgs args)
         {
             RemoveOnPlayClickButtons();
-            PathFindingClicked = true;
+            currentGame = Const.PathFinding;
             Invalidate();
         }
 
@@ -147,23 +161,62 @@ namespace Brain
         protected override void OnPaint(PaintEventArgs args)
         {
             Graphics g = args.Graphics;
-            if(User && !PlayClicked)
+            if(newUser && currentGame == Const.FirstWindow)
             {
                 DrawUsernameBox(g, "Create new username");
             }
-            else if (!User && !PlayClicked)
+            else if (!newUser && currentGame == Const.FirstWindow)
             {
                 DrawUsernameBox(g, "Enter Username");
             }
-            else if (PathFindingClicked)
+            else if (currentGame == Const.PathFinding)
             {
-                PathFindingView(g);
-                PathFindingClicked = false;
+                MessageBox.Show("INVALIDATE 1");
+                if (addSquare)
+                {
+                    MessageBox.Show("invalidate 2");
+                    DrawGrid(g);
+                    DrawStartAndEnd(g);
+                    DrawSquare(g);
+                    addSquare = false;
+                }
+                else
+                {
+                    PathFindingOnePuzzle(g);
+                }
             }
         }
         protected override void OnMouseDown(MouseEventArgs e)
         {
-            CheckIfUsernameBoxClicked(e, MConst.UsernameBoxPos());
+            if (currentGame == Const.PathFinding && wallsHidden) 
+            {
+                MessageBox.Show("if (currentGame == Const.PathFinding && wallsHidden) passed");
+                square = new MyPoint
+                (
+                    (e.X - pfUpperLeft.X) / oneSquareSize,
+                    (e.Y - pfUpperLeft.Y) / oneSquareSize
+                );
+                MessageBox.Show(square.X.ToString() + " " + square.Y.ToString());
+                if (IsValidSquare(e))
+                {
+                    MessageBox.Show("isValidSquare passed");
+                    addSquare = true;
+                    userPath.Add(square);
+                    Invalidate();
+                }
+                // draw the square
+                // if the square is the neighbour of the end node
+                // then call a function then draw the hit walls
+                // evaluate the score
+                // if numOfPuzzlesPlayed < 10
+                // call Path Finding view again
+                // else show final score and put an exit button set main menu as current game;
+                // else add to path and to maybe to wallsHit
+            }
+            else
+            {
+                CheckIfUsernameBoxClicked(e, MConst.UsernameBoxPos());
+            }
         }
         #endregion
         #region Username TextBox
@@ -212,86 +265,125 @@ namespace Brain
             g.DrawString(text, MConst.Font(), MConst.WindowBrush(), box, format);
         }
         #endregion
-        #region PathFinding
-        void PathFindingView(Graphics g)
+        #region Path Finding View
+        void PathFindingOnePuzzle(Graphics g)
         {
             Random r = new Random();
-            int[][] grid;
-            MyPoint start, end;
-            for (int _ = 0; _ < 1; _++)
+            userPath = new List<MyPoint>();
+            wallsHit = new List<MyPoint>();
+            numOfPuzzlesPlayed += 1;
+
+            // initialize game
+            game = new Game1(r.Next(6, 11));
+
+            DrawGrid(g);
+
+            // draw walls
+            DrawWalls(g, Brushes.Crimson);
+
+            wallsHidden = false;
+
+            // let the user memorize the placement of the walls
+            Thread.Sleep(4000);
+
+            // delete walls by redrawing them with different color
+            DrawWalls(g, Brushes.Thistle);
+
+            wallsHidden = true;
+
+            DrawStartAndEnd(g);
+
+            userPath.Add(game.graph.start);
+            userPath.Add(game.graph.end);
+        }
+
+        void DrawGrid(Graphics g)
+        {
+            // draw the outline of the square
+            drawnGridSize = oneSquareSize * game.gridSize;
+
+            pfUpperLeft = new Point
             {
-                // initialize game
-                Game1 game = new Game1(r.Next(6, 11));
-                grid = game.graph.grid;
-                start = game.graph.start;
-                end = game.graph.end;
+                X = Center.X - (drawnGridSize / 2),
+                Y = Center.Y - (drawnGridSize / 2)
+            };
+            Rectangle rect = new Rectangle(pfUpperLeft.X, pfUpperLeft.Y, drawnGridSize, drawnGridSize);
+            g.DrawRectangle(MConst.Pen2(), rect);
 
-                // draw the outline of the square
-                int oneSquareSize = 70;
-                int drawnGridSize = oneSquareSize * game.gridSize;
+            // draw the grid inside
+            for (int i = 0; i <= drawnGridSize; i += oneSquareSize)
+            {
+                Point fromVertical = new Point(pfUpperLeft.X + i, pfUpperLeft.Y);
+                Point toVertical = new Point(pfUpperLeft.X + i, pfUpperLeft.Y + drawnGridSize);
+                g.DrawLine(MConst.Pen2(), fromVertical, toVertical);
 
-                Pen pen = new Pen(Color.Black, 2);
-                Point upperLeft = new Point
-                {
-                    X = Center.X - (drawnGridSize / 2),
-                    Y = Center.Y - (drawnGridSize / 2)
-                };
-                Rectangle rect = new Rectangle(upperLeft.X, upperLeft.Y, drawnGridSize, drawnGridSize);
-                g.DrawRectangle(pen, rect);
-
-                // draw the grid inside
-                for(int i = 0; i <= drawnGridSize; i += oneSquareSize)
-                {
-                    Point fromVertical = new Point(upperLeft.X + i, upperLeft.Y);
-                    Point toVertical = new Point(upperLeft.X + i, upperLeft.Y + drawnGridSize);
-                    g.DrawLine(pen, fromVertical, toVertical);
-
-                    Point fromHorizontal = new Point(upperLeft.X, upperLeft.Y + i);
-                    Point toHorizontal = new Point(upperLeft.X + drawnGridSize, upperLeft.Y + i);
-                    g.DrawLine(pen, fromHorizontal, toHorizontal);
-                }
-
-                // draw walls 
-                Rectangle wall;
-                for (int i = 0; i < game.gridSize; i++)
-                {
-                    for (int j = 0; j < game.gridSize; j++)
-                    {
-                        if(grid[i][j] == 1)
-                        {
-                            wall = new Rectangle(upperLeft.X + (oneSquareSize * j), upperLeft.Y + (oneSquareSize * i), oneSquareSize, oneSquareSize);
-                            g.FillRectangle(Brushes.Crimson, wall);
-                            g.DrawRectangle(pen, wall);
-                        }
-                    }
-                }
-
-                // let the user memorize the placement of the walls
-                Thread.Sleep(4000);
-
-                // delete walls 
-                for (int i = 0; i < game.gridSize; i++)
-                {
-                    for (int j = 0; j < game.gridSize; j++)
-                    {
-                        if (grid[i][j] == 1)
-                        {
-                            wall = new Rectangle(upperLeft.X + (oneSquareSize * j), upperLeft.Y + (oneSquareSize * i), oneSquareSize, oneSquareSize);
-                            g.FillRectangle(Brushes.Thistle, wall);
-                            g.DrawRectangle(pen, wall);
-                        }
-                    }
-                }
-
-                // draw start and end
-                Rectangle rStart = new Rectangle(upperLeft.X + (oneSquareSize * start.Y), upperLeft.Y + (oneSquareSize * start.X), oneSquareSize, oneSquareSize);
-                g.FillRectangle(Brushes.PapayaWhip, rStart);
-                g.DrawRectangle(pen, rStart);
-
-                Rectangle rEnd = new Rectangle(upperLeft.X + (oneSquareSize * end.Y), upperLeft.Y + (oneSquareSize * end.X), oneSquareSize, oneSquareSize);
-                g.FillRectangle(Brushes.PapayaWhip, rEnd);
-                g.DrawRectangle(pen, rEnd);
+                Point fromHorizontal = new Point(pfUpperLeft.X, pfUpperLeft.Y + i);
+                Point toHorizontal = new Point(pfUpperLeft.X + drawnGridSize, pfUpperLeft.Y + i);
+                g.DrawLine(MConst.Pen2(), fromHorizontal, toHorizontal);
             }
+        }
+        void DrawWalls(Graphics g, Brush b)
+        {
+            for (int i = 0; i < game.gridSize; i++)
+            {
+                for (int j = 0; j < game.gridSize; j++)
+                {
+                    if (game.graph.grid[i][j] == 1)
+                    {
+                        Rectangle rect = new Rectangle(pfUpperLeft.X + (oneSquareSize * j), pfUpperLeft.Y + (oneSquareSize * i), oneSquareSize, oneSquareSize);
+                        g.FillRectangle(b, rect);
+                        g.DrawRectangle(MConst.Pen2(), rect);
+                    }
+                }
+            }
+        }
+        void DrawStartAndEnd(Graphics g)
+        {
+            MyPoint start = game.graph.start;
+            MyPoint end = game.graph.end;
+            Rectangle rect = new Rectangle(pfUpperLeft.X + (oneSquareSize * start.Y), pfUpperLeft.Y + (oneSquareSize * start.X), oneSquareSize, oneSquareSize);
+            g.FillRectangle(Brushes.PapayaWhip, rect);
+            g.DrawRectangle(MConst.Pen2(), rect);
+            g.DrawString("S", MConst.Font(), Brushes.Black, pfUpperLeft.X + (oneSquareSize * start.Y), pfUpperLeft.Y + (oneSquareSize * start.X));
+
+            rect = new Rectangle(pfUpperLeft.X + (oneSquareSize * end.Y), pfUpperLeft.Y + (oneSquareSize * end.X), oneSquareSize, oneSquareSize);
+            g.FillRectangle(Brushes.PapayaWhip, rect);
+            g.DrawRectangle(MConst.Pen2(), rect);
+            g.DrawString("E", MConst.Font(), Brushes.Black, pfUpperLeft.X + (oneSquareSize * end.Y), pfUpperLeft.Y + (oneSquareSize * end.X));
+        }
+        void DrawSquare(Graphics g)
+        {
+            Rectangle rect = new Rectangle(pfUpperLeft.X + (oneSquareSize * square.Y), pfUpperLeft.Y + (oneSquareSize * square.X), oneSquareSize, oneSquareSize);
+            g.FillRectangle(Brushes.Aquamarine, rect);
+            g.DrawRectangle(MConst.Pen2(), rect);
+        }
+        bool IsValidSquare(MouseEventArgs e)
+        {
+            if (IsInsideGrid(e) && IsConnectedToPath())
+            {
+                return true;
+            }
+            return false;
+        }
+        bool IsInsideGrid(MouseEventArgs e)
+        {
+            if(e.X > pfUpperLeft.X && e.X < pfUpperLeft.X + drawnGridSize && e.Y > pfUpperLeft.Y && e.Y < pfUpperLeft.Y + drawnGridSize)
+            {
+                return true;
+            }
+            return false;
+        } 
+        bool IsConnectedToPath()
+        {
+            foreach(MyPoint entry in userPath)
+            {
+                if (entry.Equals(new MyPoint(square.X - 1, square.Y)) || entry.Equals(new MyPoint(square.X + 1, square.Y)) ||
+                    entry.Equals(new MyPoint(square.X, square.Y - 1)) || entry.Equals(new MyPoint(square.X, square.Y + 1)))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
         #endregion
     }
