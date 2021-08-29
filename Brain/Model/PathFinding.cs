@@ -74,8 +74,8 @@ public class Game1
         g.start = new MyPoint(r.Next(0, size), r.Next(0, size));
         g.end = new MyPoint(r.Next(0, size), r.Next(0, size));
 
-        // make sure that there is at least 1 spot between start and end in any direction
-        while (Math.Abs(g.start.i - g.end.i) < 2 && Math.Abs(g.start.j - g.end.j) < 2)
+        // make sure that there is at least 2 spots between start and end in any direction
+        while (Math.Abs(g.start.i - g.end.i) < 3 && Math.Abs(g.start.j - g.end.j) < 3)
         {
             (g.end.i, g.end.j) = (r.Next(0, size), r.Next(0, size));
         }
@@ -118,13 +118,16 @@ public class Game1
 
     public int DFS(MyPoint start, MyPoint end, Graph g, List<MyPoint> visited, List<MyPoint> path, int numberOfPaths)
     {
+        if (numberOfPaths >= 3) // no reason to calculate everything, we need at least 3
+        {
+            return numberOfPaths;
+        }
         // base case, if start and end are the same node we are done and we can count in one more path
         if (start.Equals(end))
         {
             numberOfPaths += 1;
             return numberOfPaths;
         }
-
         // loop through every neighbour of the current starting node
         List<MyPoint> n = FindNeighbours(start, g); 
         foreach (MyPoint entry in n)

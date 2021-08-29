@@ -35,6 +35,9 @@ namespace ViewConstants
 
         public const int StatisticsWidth = 300;
         public const int StatisticsHeight = 150;
+
+        public const int ExitWidth = 300;
+        public const int ExitHeight = 75;
         #endregion
     }
 

@@ -23,5 +23,15 @@ namespace Brain
             };
             Application.Run(f);
         }
+        public static void WaitSec(int secs)
+        {
+            // code found at: https://www.reddit.com/r/csharp/comments/bmxb0e/less_harsh_alternative_to_threadsleep/
+            // this was the best alternative to Thread.Sleep() method I could find
+            DateTime Tthen = DateTime.Now;
+            do
+            {
+                Application.DoEvents();
+            } while (Tthen.AddSeconds(secs) > DateTime.Now);
+        }
     }
 }

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using ViewConstants;
-using System.Threading;
 
 namespace Brain
 {
@@ -22,6 +21,7 @@ namespace Brain
         Button ColorRead;
         Button WordHunt;
         Button Typing;
+        Button Exit;
         #endregion
 
         #region General global variables
@@ -66,7 +66,7 @@ namespace Brain
             ExistingUser.Click += new EventHandler(OnExsitingUserClick);
             Controls.Add(ExistingUser);
             Play = CreateButton("Play", MConst.PlayButton(), Const.PlayButtonWidth, Const.PlayButtonHeight, MConst.WindowColor(), MConst.UsernameButtonColor(), MConst.Font());
-            Play.Click += new EventHandler(OnPlayClick);
+            Play.Click += new EventHandler(MainMenu);
             Controls.Add(Play);
         }
 
@@ -85,6 +85,12 @@ namespace Brain
             button.Font = font;
             return button;
         }
+        public void ExitButton()
+        {
+            Exit = CreateButton("Exit", MConst.Statistics(), Const.ExitWidth, Const.ExitHeight, MConst.WindowColor(), MConst.StatisticsColor(), MConst.PlayFont());
+            Exit.Click += new EventHandler(MainMenu);
+            Controls.Add(Exit);
+        }
         public void OnNewUserClick(object sender, EventArgs args)
         {
             newUser = true;
@@ -96,14 +102,15 @@ namespace Brain
             Invalidate();
         }
 
-        public void OnPlayClick(object sender, EventArgs args)
+        public void MainMenu(object sender, EventArgs args)
         {
             Controls.Remove(NewUser);
             Controls.Remove(ExistingUser);
             Controls.Remove(Play);
+            Controls.Remove(Exit);
             //create Statistics button
             Statistics = CreateButton("Statistics", MConst.Statistics(), Const.StatisticsWidth, Const.StatisticsHeight, MConst.WindowColor(), MConst.StatisticsColor(), MConst.PlayFont());
-            Statistics.Click += new EventHandler(OnPlayClick);
+            Statistics.Click += new EventHandler(MainMenu);
             Controls.Add(Statistics);
             //create Path finding button
             PathFinding = CreateButton("Path Finding", MConst.Game1(), Const.GameSquareWidth, Const.GameSquareHeight, MConst.MainMenuColor(), MConst.MemoryColor(), MConst.PlayFont());
@@ -111,36 +118,37 @@ namespace Brain
             Controls.Add(PathFinding);
             //create Partial match button
             PartialMatch = CreateButton("Partial Match", MConst.Game2(), Const.GameSquareWidth, Const.GameSquareHeight, MConst.MainMenuColor(), MConst.MemoryColor(), MConst.PlayFont());
-            PartialMatch.Click += new EventHandler(OnPlayClick);
+            PartialMatch.Click += new EventHandler(MainMenu);
             Controls.Add(PartialMatch);
             //create Nanogram button
             Nanogram = CreateButton("Nanogram", MConst.Game3(), Const.GameSquareWidth, Const.GameSquareHeight, MConst.MainMenuColor(), MConst.ProblemSolvingColor(), MConst.PlayFont());
-            Nanogram.Click += new EventHandler(OnPlayClick);
+            Nanogram.Click += new EventHandler(MainMenu);
             Controls.Add(Nanogram);
             //create Low to High button
             LowToHigh = CreateButton("Low To High", MConst.Game4(), Const.GameSquareWidth, Const.GameSquareHeight, MConst.MainMenuColor(), MConst.ProblemSolvingColor(), MConst.PlayFont());
-            LowToHigh.Click += new EventHandler(OnPlayClick);
+            LowToHigh.Click += new EventHandler(MainMenu);
             Controls.Add(LowToHigh);
             //create Sort button
             Sort = CreateButton("Sort", MConst.Game5(), Const.GameSquareWidth, Const.GameSquareHeight, MConst.MainMenuColor(), MConst.FocusColor(), MConst.PlayFont());
-            Sort.Click += new EventHandler(OnPlayClick);
+            Sort.Click += new EventHandler(MainMenu);
             Controls.Add(Sort);
             //create Color read button
             ColorRead = CreateButton("Color Read", MConst.Game6(), Const.GameSquareWidth, Const.GameSquareHeight, MConst.MainMenuColor(), MConst.FocusColor(), MConst.PlayFont());
-            ColorRead.Click += new EventHandler(OnPlayClick);
+            ColorRead.Click += new EventHandler(MainMenu);
             Controls.Add(ColorRead);
             //create Word hunt button
             WordHunt = CreateButton("Word Hunt", MConst.Game7(), Const.GameSquareWidth, Const.GameSquareHeight, MConst.MainMenuColor(), MConst.LanguageColor(), MConst.PlayFont());
-            WordHunt.Click += new EventHandler(OnPlayClick);
+            WordHunt.Click += new EventHandler(MainMenu);
             Controls.Add(WordHunt);
             //create Typing button
             Typing = CreateButton("Typing", MConst.Game8(), Const.GameSquareWidth, Const.GameSquareHeight, MConst.MainMenuColor(), MConst.LanguageColor(), MConst.PlayFont());
-            Typing.Click += new EventHandler(OnPlayClick);
+            Typing.Click += new EventHandler(MainMenu);
             Controls.Add(Typing);
             currentGame = Const.MainMenu;
             CloseUsernameBoX();
             Invalidate();
         }
+        
 
         public void OnPathFindingClick(object sender, EventArgs args)
         {
@@ -174,6 +182,12 @@ namespace Brain
             {
                 DrawUsernameBox(g, "Enter Username");
             }
+            else if(currentGame == Const.Score)
+            {
+                DrawScore(g);
+                ExitButton();
+                score = 0;
+            }
             else if (currentGame == Const.PathFinding)
             {
                 if (addSquare || drawHitWalls)
@@ -183,7 +197,8 @@ namespace Brain
                     DrawListOfPoints(g,userPath, Brushes.Aquamarine);
                     if (drawHitWalls)
                     {
-                        DrawListOfPoints(g, wallsHit, Brushes.Crimson);
+                        DrawWalls(g, Brushes.Crimson);
+                        DrawListOfPoints(g, wallsHit, Brushes.Coral);
                         drawHitWalls = false;
                     }
                     addSquare = false;
@@ -216,11 +231,11 @@ namespace Brain
                     if (square.IsConnectedTo(pfGame.graph.end))
                     {
                         drawHitWalls = true;
-                        score += pfGame.gridSize * 100 - wallsHit.Count * 50;
-                        numOfPuzzlesPlayed += 1;
-                        if(numOfPuzzlesPlayed < 10)
+                        EvalPfScore();
+                        Invalidate();
+                        Program.WaitSec(2);
+                        if (numOfPuzzlesPlayed < 10)
                         {
-                            Invalidate();
                             ResetPF(numOfPuzzlesPlayed);
                         }
                         else
@@ -231,14 +246,6 @@ namespace Brain
                     }
                     Invalidate();
                 }
-                // draw the square
-                // if the square is the neighbour of the end node
-                // then call a function then draw the hit walls
-                // evaluate the score
-                // if numOfPuzzlesPlayed < 10
-                // call Path Finding view again
-                // else show final score and put an exit button set main menu as current game;
-                // else add to path and to maybe to wallsHit
             }
             else
             {
@@ -292,7 +299,28 @@ namespace Brain
             g.DrawString(text, MConst.Font(), MConst.WindowBrush(), box, format);
         }
         #endregion
+        #region Score
+        void DrawScore(Graphics g)
+        {
+            Point UpperLeft = new Point
+            {
+                X = Center.X - (500 / 2) - 100,
+                Y = Center.Y - (500 / 2) + 100
+            };
+            Font font = new Font("Times New Roman", 100);
+            g.DrawString("Score: " + score.ToString(), font, Brushes.Lavender, UpperLeft.X, UpperLeft.Y);
+        }
+        void EvalPfScore()
+        {
+            if (wallsHit.Count == 0)
+            {
+                score += pfGame.gridSize * 100;
+            }
+            score += (userPath.Count - wallsHit.Count) * 25;
+        }
+        #endregion
         #region Path Finding View
+        // NOTE: x-axis corresponds to j and y-axis corresponds to i
         void PathFindingOnePuzzle(Graphics g)
         {
             Random r = new Random();
@@ -301,7 +329,7 @@ namespace Brain
             numOfPuzzlesPlayed += 1;
 
             // initialize game
-            pfGame = new Game1(r.Next(6, 11));
+            pfGame = new Game1(r.Next(6, 9));
             userPath.Add(pfGame.graph.start);
 
             DrawGrid(g);
@@ -312,7 +340,7 @@ namespace Brain
             wallsHidden = false;
 
             // let the user memorize the placement of the walls
-            Thread.Sleep(4000);
+            Program.WaitSec(4);
 
             // delete walls by redrawing them with different color
             DrawWalls(g, Brushes.Thistle);
@@ -346,7 +374,6 @@ namespace Brain
                 g.DrawLine(MConst.Pen2(), fromHorizontal, toHorizontal);
             }
         }
-        // x-axis corresponds to j and y-axis corresponds to i
         void DrawWalls(Graphics g, Brush b)
         {
             for (int i = 0; i < pfGame.gridSize; i++)
