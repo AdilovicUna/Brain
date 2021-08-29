@@ -15,7 +15,8 @@ namespace ViewConstants
         public const int ColorRead = 6;
         public const int WordHunt = 7;
         public const int Typing = 8;
-        public const int Statistics = 9;
+        public const int Score = 9;
+        public const int Statistics = 10;
 
         public const int WindowWidth = 1500;
         public const int WindowHeight = 900;

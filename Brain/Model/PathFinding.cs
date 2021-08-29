@@ -3,12 +3,12 @@ using System.Collections.Generic;
 
 public class MyPoint // named like this because it overlapped with a class Point used in Form1.cs
 {
-    public int X { get; set; }
-    public int Y { get; set; }
+    public int i { get; set; }
+    public int j { get; set; }
     public MyPoint(int x1, int y1)
     {
-        X = x1;
-        Y = y1;
+        i = x1;
+        j = y1;
     }
 
     public override bool Equals(object obj)
@@ -17,12 +17,21 @@ public class MyPoint // named like this because it overlapped with a class Point
         {
             return false;
         }
-        return (X == ((MyPoint)obj).X) && (Y == ((MyPoint)obj).Y);
+        return (i == ((MyPoint)obj).i) && (j == ((MyPoint)obj).j);
     }
 
     public override int GetHashCode()
     {
-        return X.GetHashCode() ^ Y.GetHashCode();
+        return i.GetHashCode() ^ j.GetHashCode();
+    }
+    public bool IsConnectedTo(MyPoint p)
+    {
+        if (Equals(new MyPoint(p.i - 1, p.j)) || Equals(new MyPoint(p.i + 1, p.j)) ||
+            Equals(new MyPoint(p.i, p.j - 1)) || Equals(new MyPoint(p.i, p.j + 1)))
+        {
+            return true;
+        }
+        return false;
     }
 }
 
@@ -66,9 +75,9 @@ public class Game1
         g.end = new MyPoint(r.Next(0, size), r.Next(0, size));
 
         // make sure that there is at least 1 spot between start and end in any direction
-        while (Math.Abs(g.start.X - g.end.X) < 2 && Math.Abs(g.start.Y - g.end.Y) < 2)
+        while (Math.Abs(g.start.i - g.end.i) < 2 && Math.Abs(g.start.j - g.end.j) < 2)
         {
-            (g.end.X, g.end.Y) = (r.Next(0, size), r.Next(0, size));
+            (g.end.i, g.end.j) = (r.Next(0, size), r.Next(0, size));
         }
 
         // place mines (every spot has 30% chance of being a mine)
@@ -90,8 +99,8 @@ public class Game1
             }
         }
         //place start and end
-        g.grid[g.start.X][g.start.Y] = 2;
-        g.grid[g.end.X][g.end.Y] = 2;
+        g.grid[g.start.i][g.start.j] = 2;
+        g.grid[g.end.i][g.end.j] = 2;
 
         return g;
     }
@@ -140,7 +149,7 @@ public class Game1
     public bool IsWall(MyPoint p, Graph g)
     {
         // walls are marked with a number 1
-        if (g.grid[p.X][p.Y] == 1)
+        if (g.grid[p.i][p.j] == 1)
         {
             return true;
         }
@@ -166,11 +175,11 @@ public class Game1
         List<MyPoint> neighbours = new List<MyPoint>();
         for (int i = 0; i < 4; i++)
         {
-            MyPoint maybeNeighbour = new MyPoint(p.X + directionX[i], p.Y + directionY[i]);
+            MyPoint maybeNeighbour = new MyPoint(p.i + directionX[i], p.j + directionY[i]);
             // check if there are any walls in the left, right, up and down direction from p
             // also check if p is a starting point, or if the maybeNeighbour is out of bounds of the grid
-            if (maybeNeighbour.X < gridSize && maybeNeighbour.Y < gridSize &&
-                maybeNeighbour.X >= 0 && maybeNeighbour.Y >= 0 &&
+            if (maybeNeighbour.i < gridSize && maybeNeighbour.j < gridSize &&
+                maybeNeighbour.i >= 0 && maybeNeighbour.j >= 0 &&
                 !IsWall(maybeNeighbour, g) && !IsStart(maybeNeighbour, g))
             {
                 neighbours.Add(maybeNeighbour);
