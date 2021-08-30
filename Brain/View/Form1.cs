@@ -15,24 +15,35 @@ namespace Brain
         Button Statistics;
         Button PathFinding;
         Button PartialMatch;
-        Button Nanogram;
         Button LowToHigh;
-        Button Sort;
         Button ColorRead;
-        Button WordHunt;
-        Button Typing;
         Button Exit;
         #endregion
 
         #region General global variables
+        readonly Color WindowColor = Color.Thistle;
+        readonly Brush WindowBrush = Brushes.Thistle;
+        readonly Pen p = new Pen(Color.Black, 2);
+        readonly Font f1 = new Font("Times New Roman", 30);
+        readonly Font f2 = new Font("Times New Roman", 20);
+        readonly StringFormat format = new StringFormat
+        {
+            LineAlignment = StringAlignment.Center,
+            Alignment = StringAlignment.Center
+        };
         Point Center = new Point
         {
             X = Const.WindowWidth / 2,
             Y = Const.WindowHeight / 2
         };
-        int currentGame = Const.FirstWindow;
+
+        int current = Const.FirstWindow;
         bool newUser = false;
         int score = 0;
+        #endregion
+
+        #region UsernameBox global variables
+        readonly Point UsernameBoxPos = new Point((Const.WindowWidth / 2) - (Const.UsernameWidth / 2), (Const.WindowHeight / 2) - (Const.UsernameHeight / 2) - 200);
         #endregion
 
         #region Path Finding global variables
@@ -55,17 +66,24 @@ namespace Brain
         {
             InitializeComponent();
             ClientSize = new Size(Const.WindowWidth, Const.WindowHeight);
-            BackColor = MConst.WindowColor();
+            BackColor = WindowColor;
+
+            Color UsernameButtonColor = Color.PaleVioletRed;
+
+            Point NewUserButton = new Point((Const.WindowWidth / 2) - (Const.UsernameWidth / 2), (Const.WindowHeight / 2) - (Const.UsernameHeight / 2) - 80);
+            Point ExsistingUserButton = new Point((Const.WindowWidth / 2) - (Const.UsernameWidth / 2), (Const.WindowHeight / 2) - (Const.UsernameHeight / 2) + 75);
+            Point PlayButton = new Point(1150, 700);
 
             //create new username button
-            NewUser = CreateButton("New newUser", MConst.NewUserButtonPos(), Const.UsernameButtonWidth, Const.UsernameButtonHeight, MConst.WindowColor(), MConst.UsernameButtonColor(), MConst.Font());
+            NewUser = CreateButton("New newUser", NewUserButton, Const.UsernameButtonWidth, Const.UsernameButtonHeight, WindowColor, UsernameButtonColor, f1);
             NewUser.Click += new EventHandler(OnNewUserClick);
             Controls.Add(NewUser);
             //create existing username button
-            ExistingUser = CreateButton("Existing newUser", MConst.ExsistingUserButtonPos(), Const.UsernameButtonWidth, Const.UsernameButtonHeight, MConst.WindowColor(), MConst.UsernameButtonColor(), MConst.Font());
+            ExistingUser = CreateButton("Existing newUser", ExsistingUserButton, Const.UsernameButtonWidth, Const.UsernameButtonHeight, WindowColor, UsernameButtonColor, f1);
             ExistingUser.Click += new EventHandler(OnExsitingUserClick);
             Controls.Add(ExistingUser);
-            Play = CreateButton("Play", MConst.PlayButton(), Const.PlayButtonWidth, Const.PlayButtonHeight, MConst.WindowColor(), MConst.UsernameButtonColor(), MConst.Font());
+            //create play button
+            Play = CreateButton("Play", PlayButton, Const.PlayButtonWidth, Const.PlayButtonHeight, WindowColor, UsernameButtonColor, f1);
             Play.Click += new EventHandler(MainMenu);
             Controls.Add(Play);
         }
@@ -74,20 +92,23 @@ namespace Brain
         public Button CreateButton(string buttonName, Point location, int width, int height, Color forecolor, Color backcolor, Font font)
         {
             //function that creates a button given certian parameters
-            Button button = new Button();
-            button.Height = height;
-            button.Width = width;
-            button.ForeColor = forecolor;
-            button.BackColor = backcolor;
-            button.Location = location;
-            button.Text = buttonName;
-            button.Name = buttonName;
-            button.Font = font;
+            Button button = new Button
+            {
+                Height = height,
+                Width = width,
+                ForeColor = forecolor,
+                BackColor = backcolor,
+                Location = location,
+                Text = buttonName,
+                Name = buttonName,
+                Font = font
+            };
             return button;
         }
         public void ExitButton()
         {
-            Exit = CreateButton("Exit", MConst.Statistics(), Const.ExitWidth, Const.ExitHeight, MConst.WindowColor(), MConst.StatisticsColor(), MConst.PlayFont());
+            Point ExitPos = new Point(600, 650);
+            Exit = CreateButton("Exit", ExitPos, Const.ExitWidth, Const.ExitHeight, Color.LavenderBlush, Color.LightGreen, f1);
             Exit.Click += new EventHandler(MainMenu);
             Controls.Add(Exit);
         }
@@ -104,47 +125,42 @@ namespace Brain
 
         public void MainMenu(object sender, EventArgs args)
         {
+            Controls.Remove(Exit);
             Controls.Remove(NewUser);
             Controls.Remove(ExistingUser);
             Controls.Remove(Play);
-            Controls.Remove(Exit);
+
+            Point Game1Pos = new Point(100, 250);
+            Point Game2Pos = new Point(450, 250);
+            Point Game3Pos = new Point(800, 250);
+            Point Game4Pos = new Point(1150, 250);
+            Point StatisticsPos = new Point(600, 650);
+
+            Color forecolor = Color.LavenderBlush;
+            Color backcolor = Color.LightSteelBlue;
+
             //create Statistics button
-            Statistics = CreateButton("Statistics", MConst.Statistics(), Const.StatisticsWidth, Const.StatisticsHeight, MConst.WindowColor(), MConst.StatisticsColor(), MConst.PlayFont());
+            Statistics = CreateButton("Statistics", StatisticsPos, Const.StatisticsWidth, Const.StatisticsHeight, WindowColor, Color.LavenderBlush, f1);
             Statistics.Click += new EventHandler(MainMenu);
             Controls.Add(Statistics);
             //create Path finding button
-            PathFinding = CreateButton("Path Finding", MConst.Game1(), Const.GameSquareWidth, Const.GameSquareHeight, MConst.MainMenuColor(), MConst.MemoryColor(), MConst.PlayFont());
+            PathFinding = CreateButton("Path Finding", Game1Pos, Const.GameSquareWidth, Const.GameSquareHeight, forecolor, backcolor, f1);
             PathFinding.Click += new EventHandler(OnPathFindingClick);
             Controls.Add(PathFinding);
-            //create Partial match button
-            PartialMatch = CreateButton("Partial Match", MConst.Game2(), Const.GameSquareWidth, Const.GameSquareHeight, MConst.MainMenuColor(), MConst.MemoryColor(), MConst.PlayFont());
-            PartialMatch.Click += new EventHandler(MainMenu);
-            Controls.Add(PartialMatch);
-            //create Nanogram button
-            Nanogram = CreateButton("Nanogram", MConst.Game3(), Const.GameSquareWidth, Const.GameSquareHeight, MConst.MainMenuColor(), MConst.ProblemSolvingColor(), MConst.PlayFont());
-            Nanogram.Click += new EventHandler(MainMenu);
-            Controls.Add(Nanogram);
             //create Low to High button
-            LowToHigh = CreateButton("Low To High", MConst.Game4(), Const.GameSquareWidth, Const.GameSquareHeight, MConst.MainMenuColor(), MConst.ProblemSolvingColor(), MConst.PlayFont());
+            LowToHigh = CreateButton("Low To High", Game2Pos, Const.GameSquareWidth, Const.GameSquareHeight, forecolor, backcolor, f1);
             LowToHigh.Click += new EventHandler(MainMenu);
             Controls.Add(LowToHigh);
-            //create Sort button
-            Sort = CreateButton("Sort", MConst.Game5(), Const.GameSquareWidth, Const.GameSquareHeight, MConst.MainMenuColor(), MConst.FocusColor(), MConst.PlayFont());
-            Sort.Click += new EventHandler(MainMenu);
-            Controls.Add(Sort);
             //create Color read button
-            ColorRead = CreateButton("Color Read", MConst.Game6(), Const.GameSquareWidth, Const.GameSquareHeight, MConst.MainMenuColor(), MConst.FocusColor(), MConst.PlayFont());
+            ColorRead = CreateButton("Color Read", Game3Pos, Const.GameSquareWidth, Const.GameSquareHeight, forecolor, backcolor, f1);
             ColorRead.Click += new EventHandler(MainMenu);
             Controls.Add(ColorRead);
-            //create Word hunt button
-            WordHunt = CreateButton("Word Hunt", MConst.Game7(), Const.GameSquareWidth, Const.GameSquareHeight, MConst.MainMenuColor(), MConst.LanguageColor(), MConst.PlayFont());
-            WordHunt.Click += new EventHandler(MainMenu);
-            Controls.Add(WordHunt);
-            //create Typing button
-            Typing = CreateButton("Typing", MConst.Game8(), Const.GameSquareWidth, Const.GameSquareHeight, MConst.MainMenuColor(), MConst.LanguageColor(), MConst.PlayFont());
-            Typing.Click += new EventHandler(MainMenu);
-            Controls.Add(Typing);
-            currentGame = Const.MainMenu;
+            //create Partial match button
+            PartialMatch = CreateButton("Partial Match", Game4Pos, Const.GameSquareWidth, Const.GameSquareHeight, forecolor, backcolor, f1);
+            PartialMatch.Click += new EventHandler(MainMenu);
+            Controls.Add(PartialMatch);
+
+            current = Const.MainMenu;
             CloseUsernameBoX();
             Invalidate();
         }
@@ -153,7 +169,7 @@ namespace Brain
         public void OnPathFindingClick(object sender, EventArgs args)
         {
             RemoveOnPlayClickButtons();
-            currentGame = Const.PathFinding;
+            current = Const.PathFinding;
             Invalidate();
         }
 
@@ -161,34 +177,30 @@ namespace Brain
         {
             Controls.Remove(Statistics);
             Controls.Remove(PathFinding);
-            Controls.Remove(PartialMatch);
-            Controls.Remove(Nanogram);
             Controls.Remove(LowToHigh);
-            Controls.Remove(Sort);
             Controls.Remove(ColorRead);
-            Controls.Remove(WordHunt);
-            Controls.Remove(Typing);
+            Controls.Remove(PartialMatch);
         }
         #endregion
         #region Overrides
         protected override void OnPaint(PaintEventArgs args)
         {
             Graphics g = args.Graphics;
-            if(newUser && currentGame == Const.FirstWindow)
+            if(newUser && current == Const.FirstWindow)
             {
                 DrawUsernameBox(g, "Create new username");
             }
-            else if (!newUser && currentGame == Const.FirstWindow)
+            else if (!newUser && current == Const.FirstWindow)
             {
                 DrawUsernameBox(g, "Enter Username");
             }
-            else if(currentGame == Const.Score)
+            else if(current == Const.Score)
             {
                 DrawScore(g);
                 ExitButton();
                 score = 0;
             }
-            else if (currentGame == Const.PathFinding)
+            else if (current == Const.PathFinding)
             {
                 if (addSquare || drawHitWalls)
                 {
@@ -198,7 +210,7 @@ namespace Brain
                     if (drawHitWalls)
                     {
                         DrawWalls(g, Brushes.Crimson);
-                        DrawListOfPoints(g, wallsHit, Brushes.Coral);
+                        DrawListOfPoints(g, wallsHit, Brushes.LightSeaGreen);
                         drawHitWalls = false;
                     }
                     addSquare = false;
@@ -211,7 +223,7 @@ namespace Brain
         }
         protected override void OnMouseDown(MouseEventArgs e)
         {
-            if (currentGame == Const.PathFinding && wallsHidden) 
+            if (current == Const.PathFinding && wallsHidden) 
             {
                 MyPoint square = new MyPoint
                 (
@@ -234,13 +246,13 @@ namespace Brain
                         EvalPfScore();
                         Invalidate();
                         Program.WaitSec(2);
-                        if (numOfPuzzlesPlayed < 10)
+                        if (numOfPuzzlesPlayed < 1)
                         {
                             ResetPF(numOfPuzzlesPlayed);
                         }
                         else
                         {
-                            currentGame = Const.Score;
+                            current = Const.Score;
                             ResetPF(0);
                         }
                     }
@@ -249,7 +261,7 @@ namespace Brain
             }
             else
             {
-                CheckIfUsernameBoxClicked(e, MConst.UsernameBoxPos());
+                CheckIfUsernameBoxClicked(e);
             }
         }
         #endregion
@@ -260,10 +272,9 @@ namespace Brain
         {
             editBox = new TextBox
             { 
-                Font = MConst.Font()
+                Font = f1
             };
-            Point p = MConst.UsernameBoxPos();
-            editBox.SetBounds(p.X, p.Y, Const.UsernameWidth, Const.UsernameHeight);
+            editBox.SetBounds(UsernameBoxPos.X, UsernameBoxPos.Y, Const.UsernameWidth, Const.UsernameHeight);
             editBox.Multiline = true;
             Controls.Add(editBox);
             editBox.Focus();
@@ -277,11 +288,12 @@ namespace Brain
                 Invalidate();
             }
         }
-        void CheckIfUsernameBoxClicked(MouseEventArgs e, Point p)
+        void CheckIfUsernameBoxClicked(MouseEventArgs e)
         {
             CloseUsernameBoX();
-            int x = (e.X - p.X);
-            int y = (e.Y - p.Y);
+
+            int x = (e.X - UsernameBoxPos.X);
+            int y = (e.Y - UsernameBoxPos.Y);
             if (x < Const.UsernameWidth && y < Const.UsernameHeight)
             {
                 OpenUsernameBox();
@@ -289,14 +301,10 @@ namespace Brain
         }
         void DrawUsernameBox(Graphics g, string text)
         {
-            Rectangle box = new Rectangle(MConst.UsernameBoxPos(), MConst.UsernameSize());
-
-            StringFormat format = new StringFormat();
-            format.LineAlignment = StringAlignment.Center;
-            format.Alignment = StringAlignment.Center;
-
-            g.FillRectangle(MConst.UsernameBoxBrush(), box);
-            g.DrawString(text, MConst.Font(), MConst.WindowBrush(), box, format);
+            Rectangle box = new Rectangle(UsernameBoxPos, new Size(Const.UsernameWidth, Const.UsernameHeight));
+            Brush b = Brushes.Lavender;
+            g.FillRectangle(b, box);
+            g.DrawString(text, f1, WindowBrush, box, format);
         }
         #endregion
         #region Score
@@ -343,7 +351,7 @@ namespace Brain
             Program.WaitSec(4);
 
             // delete walls by redrawing them with different color
-            DrawWalls(g, Brushes.Thistle);
+            DrawWalls(g, WindowBrush);
 
             wallsHidden = true;
 
@@ -360,18 +368,18 @@ namespace Brain
                 Y = Center.Y - (drawnGridSize / 2)
             };
             Rectangle rect = new Rectangle(pfUpperLeft.X, pfUpperLeft.Y, drawnGridSize, drawnGridSize);
-            g.DrawRectangle(MConst.Pen2(), rect);
+            g.DrawRectangle(p, rect);
 
             // draw the grid inside
             for (int i = 0; i <= drawnGridSize; i += oneSquareSize)
             {
                 Point fromVertical = new Point(pfUpperLeft.X + i, pfUpperLeft.Y);
                 Point toVertical = new Point(pfUpperLeft.X + i, pfUpperLeft.Y + drawnGridSize);
-                g.DrawLine(MConst.Pen2(), fromVertical, toVertical);
+                g.DrawLine(p, fromVertical, toVertical);
 
                 Point fromHorizontal = new Point(pfUpperLeft.X, pfUpperLeft.Y + i);
                 Point toHorizontal = new Point(pfUpperLeft.X + drawnGridSize, pfUpperLeft.Y + i);
-                g.DrawLine(MConst.Pen2(), fromHorizontal, toHorizontal);
+                g.DrawLine(p, fromHorizontal, toHorizontal);
             }
         }
         void DrawWalls(Graphics g, Brush b)
@@ -384,7 +392,7 @@ namespace Brain
                     {
                         Rectangle rect = new Rectangle(pfUpperLeft.X + (oneSquareSize * j), pfUpperLeft.Y + (oneSquareSize * i), oneSquareSize, oneSquareSize);
                         g.FillRectangle(b, rect);
-                        g.DrawRectangle(MConst.Pen2(), rect);
+                        g.DrawRectangle(p, rect);
                     }
                 }
             }
@@ -395,13 +403,13 @@ namespace Brain
             MyPoint end = pfGame.graph.end;
             Rectangle rect = new Rectangle(pfUpperLeft.X + (oneSquareSize * start.j), pfUpperLeft.Y + (oneSquareSize * start.i), oneSquareSize, oneSquareSize);
             g.FillRectangle(Brushes.PapayaWhip, rect);
-            g.DrawRectangle(MConst.Pen2(), rect);
-            g.DrawString("S", MConst.Font(), Brushes.Black, pfUpperLeft.X + (oneSquareSize * start.j), pfUpperLeft.Y + (oneSquareSize * start.i));
+            g.DrawRectangle(p, rect);
+            g.DrawString("S", f1, Brushes.Plum, (pfUpperLeft.X + (oneSquareSize * start.j)) + oneSquareSize / 2, (pfUpperLeft.Y + (oneSquareSize * start.i)) + oneSquareSize / 2, format);
 
             rect = new Rectangle(pfUpperLeft.X + (oneSquareSize * end.j), pfUpperLeft.Y + (oneSquareSize * end.i), oneSquareSize, oneSquareSize);
             g.FillRectangle(Brushes.PapayaWhip, rect);
-            g.DrawRectangle(MConst.Pen2(), rect);
-            g.DrawString("E", MConst.Font(), Brushes.Black, pfUpperLeft.X + (oneSquareSize * end.j), pfUpperLeft.Y + (oneSquareSize * end.i));
+            g.DrawRectangle(p, rect);
+            g.DrawString("E", f1, Brushes.Plum, (pfUpperLeft.X + (oneSquareSize * end.j)) + oneSquareSize/2, (pfUpperLeft.Y + (oneSquareSize * end.i)) + oneSquareSize / 2, format);
         }
         void DrawListOfPoints(Graphics g, List<MyPoint> l, Brush b)
         {
@@ -412,7 +420,7 @@ namespace Brain
                 {
                     rect = new Rectangle(pfUpperLeft.X + (oneSquareSize * entry.j), pfUpperLeft.Y + (oneSquareSize * entry.i), oneSquareSize, oneSquareSize);
                     g.FillRectangle(b, rect);
-                    g.DrawRectangle(MConst.Pen2(), rect);
+                    g.DrawRectangle(p, rect);
                 }
             }
         }
