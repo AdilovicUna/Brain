@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using ViewConstants;
+using System.IO;
 
 namespace Brain
 {
@@ -44,6 +45,9 @@ namespace Brain
 
         #region UsernameBox global variables
         readonly Point UsernameBoxPos = new Point((Const.WindowWidth / 2) - (Const.UsernameWidth / 2), (Const.WindowHeight / 2) - (Const.UsernameHeight / 2) - 200);
+        TextBox editBox;
+        string User = "";
+        string UserFilePath;
         #endregion
 
         #region Path Finding global variables
@@ -75,11 +79,11 @@ namespace Brain
             Point PlayButton = new Point(1150, 700);
 
             //create new username button
-            NewUser = CreateButton("New newUser", NewUserButton, Const.UsernameButtonWidth, Const.UsernameButtonHeight, WindowColor, UsernameButtonColor, f1);
+            NewUser = CreateButton("New User", NewUserButton, Const.UsernameButtonWidth, Const.UsernameButtonHeight, WindowColor, UsernameButtonColor, f1);
             NewUser.Click += new EventHandler(OnNewUserClick);
             Controls.Add(NewUser);
             //create existing username button
-            ExistingUser = CreateButton("Existing newUser", ExsistingUserButton, Const.UsernameButtonWidth, Const.UsernameButtonHeight, WindowColor, UsernameButtonColor, f1);
+            ExistingUser = CreateButton("Existing User", ExsistingUserButton, Const.UsernameButtonWidth, Const.UsernameButtonHeight, WindowColor, UsernameButtonColor, f1);
             ExistingUser.Click += new EventHandler(OnExsitingUserClick);
             Controls.Add(ExistingUser);
             //create play button
@@ -126,6 +130,37 @@ namespace Brain
 
         public void MainMenu(object sender, EventArgs args)
         {
+            CloseUsernameBoX();
+            if(current == Const.FirstWindow && User != "")
+            {
+                UserFilePath = @"C:\Users\Una\Desktop\C#\Brain\Brain\Users\" + User + ".txt";
+                if (newUser == false)
+                {
+                    if (!File.Exists(UserFilePath))
+                    {
+                        MessageBox.Show(@"ERROR: Username " + User + " doesn't exist." +
+                            "Click New User or enter a different username");
+                    }
+                    else
+                    {
+                        LoadMainMenu();
+                    }
+                }
+                else
+                {
+                    // not working without the full path
+                    File.Create(UserFilePath);
+                    LoadMainMenu();
+                }
+            }
+            else if(User != "") // user was already loaded
+            {
+                LoadMainMenu();
+            }
+            Invalidate();
+        }
+        void LoadMainMenu()
+        {
             Controls.Remove(Exit);
             Controls.Remove(NewUser);
             Controls.Remove(ExistingUser);
@@ -162,8 +197,6 @@ namespace Brain
             Controls.Add(PartialMatch);
 
             current = Const.MainMenu;
-            CloseUsernameBoX();
-            Invalidate();
         }
         public void OnPathFindingClick(object sender, EventArgs args)
         {
@@ -180,6 +213,7 @@ namespace Brain
             Controls.Remove(PartialMatch);
         }
         #endregion
+
         #region Overrides
         protected override void OnPaint(PaintEventArgs args)
         {
@@ -221,41 +255,9 @@ namespace Brain
         }
         protected override void OnMouseDown(MouseEventArgs e)
         {
-            if (current == Const.PathFinding && wallsHidden) 
+            if (current == Const.PathFinding && wallsHidden) // no need to click anything if walls arent hidden
             {
-                MyPoint square = new MyPoint
-                (
-                    (e.Y - pfUpperLeft.Y) / oneSquareSize,
-                    (e.X - pfUpperLeft.X) / oneSquareSize
-                );
-                if (IsValidSquare(e, square))
-                {
-                    addSquare = true;
-                    userPath.Add(square);
-
-                    if (pfGame.graph.grid[square.i][square.j] == 1) // if square is a wall
-                    {
-                        wallsHit.Add(square);
-                    }
-
-                    if (square.IsConnectedTo(pfGame.graph.end))
-                    {
-                        drawHitWalls = true;
-                        EvalPfScore();
-                        Invalidate();
-                        Program.WaitSec(2);
-                        if (numOfPuzzlesPlayed < 1)
-                        {
-                            ResetPF(numOfPuzzlesPlayed);
-                        }
-                        else
-                        {
-                            current = Const.Score;
-                            ResetPF(0);
-                        }
-                    }
-                    Invalidate();
-                }
+                PfGameControls(e);
             }
             else
             {
@@ -263,9 +265,9 @@ namespace Brain
             }
         }
         #endregion
+
         #region Username TextBox
         // open and close username box
-        TextBox editBox;
         void OpenUsernameBox()
         {
             editBox = new TextBox
@@ -273,7 +275,6 @@ namespace Brain
                 Font = f1
             };
             editBox.SetBounds(UsernameBoxPos.X, UsernameBoxPos.Y, Const.UsernameWidth, Const.UsernameHeight);
-            editBox.Multiline = true;
             Controls.Add(editBox);
             editBox.Focus();
         }
@@ -281,6 +282,7 @@ namespace Brain
         {
             if (editBox != null)
             {
+                User = editBox.Text;
                 Controls.Remove(editBox);
                 editBox = null;
                 Invalidate();
@@ -305,6 +307,7 @@ namespace Brain
             g.DrawString(text, f1, WindowBrush, box, format);
         }
         #endregion
+
         #region Score
         void DrawScore(Graphics g)
         {
@@ -325,8 +328,50 @@ namespace Brain
             score += (userPath.Count - wallsHit.Count) * 25;
         }
         #endregion
+
+        // GAME REQUIREMENTS:
+        // Each game has to have 5 main things: model (in a separate file), controls, score eval function, general drawing and a reset function
+
         #region Path Finding View
         // NOTE: x-axis corresponds to j and y-axis corresponds to i
+        void PfGameControls(MouseEventArgs e)
+        {
+            MyPoint square = new MyPoint // derermine which square was clicked
+            (
+                (e.Y - pfUpperLeft.Y) / oneSquareSize,
+                (e.X - pfUpperLeft.X) / oneSquareSize
+            );
+
+
+            if (IsValidSquare(e, square))
+            {
+                addSquare = true;
+                userPath.Add(square);
+
+                if (pfGame.graph.grid[square.i][square.j] == 1) // if square is a wall
+                {
+                    wallsHit.Add(square);
+                }
+
+                if (square.IsConnectedTo(pfGame.graph.end)) // our starting and ending points are connected with a path
+                {
+                    drawHitWalls = true;
+                    EvalPfScore();
+                    Invalidate();
+                    Program.WaitSec(2); // aesthetics
+                    if (numOfPuzzlesPlayed < 1) // repeat if 10 puzzles weren't played
+                    {
+                        ResetPF(numOfPuzzlesPlayed);
+                    }
+                    else // if they were, show the score, reset and exit
+                    {
+                        current = Const.Score;
+                        ResetPF(0);
+                    }
+                }
+                Invalidate();
+            }
+        }
         void PathFindingOnePuzzle(Graphics g)
         {
             Random r = new Random();
