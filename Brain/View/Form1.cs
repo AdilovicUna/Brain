@@ -107,6 +107,7 @@ namespace Brain
         }
         public void ExitButton()
         {
+            current = Const.MainMenu;
             Point ExitPos = new Point(600, 650);
             Exit = CreateButton("Exit", ExitPos, Const.ExitWidth, Const.ExitHeight, Color.LavenderBlush, Color.LightGreen, f1);
             Exit.Click += new EventHandler(MainMenu);
@@ -164,15 +165,12 @@ namespace Brain
             CloseUsernameBoX();
             Invalidate();
         }
-        
-
         public void OnPathFindingClick(object sender, EventArgs args)
         {
             RemoveOnPlayClickButtons();
             current = Const.PathFinding;
             Invalidate();
         }
-
         public void RemoveOnPlayClickButtons()
         {
             Controls.Remove(Statistics);
@@ -197,8 +195,8 @@ namespace Brain
             else if(current == Const.Score)
             {
                 DrawScore(g);
-                ExitButton();
                 score = 0;
+                ExitButton();
             }
             else if (current == Const.PathFinding)
             {
