@@ -14,6 +14,8 @@ namespace ViewConstants
         public const int Score = 5;
         public const int Statistics = 6;
 
+        public const int NumberOfGames = 4;
+
         public const int WindowWidth = 1500;
         public const int WindowHeight = 900;
 
