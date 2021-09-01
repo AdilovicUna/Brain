@@ -131,24 +131,26 @@ namespace Brain
             if (current == Const.FirstWindow && user.Name != null)
             {
                 user.UserFilePath = @"user_" + user.Name + ".txt";
-                if (newUser == false)
+
+                if (!File.Exists(user.UserFilePath))
                 {
-                    if (!File.Exists(user.UserFilePath))
+                    if(newUser == true)
                     {
-                        MessageBox.Show(@"ERROR: Username " + user.Name + " doesn't exist." +
-                            "Click New User or enter a different username");
+                        File.Create(user.UserFilePath);
+                        LoadMainMenu();
                     }
                     else
                     {
-                        LoadMainMenu();
+                        MessageBox.Show(@"ERROR: Username " + user.Name + " doesn't exist." +
+                        "Click New User or enter a different username");
                     }
+                       
                 }
                 else
                 {
-                    // not working without the full path
-                    File.Create(user.UserFilePath);
                     LoadMainMenu();
                 }
+                
             }
             else if (user.Name != null) // user was already loaded
             {
