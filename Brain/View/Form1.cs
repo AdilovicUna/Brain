@@ -264,7 +264,7 @@ namespace Brain
         }
         protected override void OnMouseDown(MouseEventArgs e)
         {
-            if (current == Const.PathFinding && wallsHidden) // no need to click anything if walls arent hidden
+            if (current == Const.PathFinding && wallsHidden) // no need to click anything in this game if walls arent hidden
             {
                 PfGameControls(e);
             }
@@ -339,19 +339,7 @@ namespace Brain
         void DrawStatistics(Graphics g)
         {
             ExitButton();
-            Dictionary<string, List<int>> data = new Dictionary<string, List<int>>();
-            using StreamReader sr = new StreamReader("TestFile.txt");
-            string line;
-            string[] splitLine;
-            while ((line = sr.ReadLine()) != null)
-            {
-                splitLine = line.Split();
-                if (!data.ContainsKey(splitLine[0]))
-                {
-                    data.Add(splitLine[0], new List<int>());
-                }
-                data[splitLine[0]].Add(Int32.Parse(splitLine[1]));
-            }
+           
         }
         #endregion
         #region Path Finding View
@@ -387,7 +375,7 @@ namespace Brain
                     }
                     else // if they were, show the score, reset and exit
                     {
-                        user.StoreScore("Path Finding", Games.score);
+                        user.StoreData("Path Finding", Games.score);
                         current = Const.Score;
                         ResetPF(0);
                     }
