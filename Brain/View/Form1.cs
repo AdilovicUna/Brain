@@ -17,7 +17,7 @@ namespace Brain
         Button Statistics;
         Button PathFinding;
         Button PartialMatch;
-        Button LowToHigh;
+        Button SumUp;
         Button ColorRead;
         Button Exit;
         #endregion
@@ -53,6 +53,7 @@ namespace Brain
         #region Path Finding global variables
         Game1 pfGame = new Game1(6);
         readonly int oneSquareSize = 70;
+        readonly int maxPuzzles = 1;
 
         Point pfUpperLeft;
         int drawnGridSize;
@@ -183,9 +184,9 @@ namespace Brain
             PathFinding.Click += new EventHandler(OnPathFindingClick);
             Controls.Add(PathFinding);
             //create Low to High button
-            LowToHigh = CreateButton("Low To High", Game2Pos, Const.GameSquareWidth, Const.GameSquareHeight, forecolor, backcolor, f1);
-            LowToHigh.Click += new EventHandler(MainMenu);
-            Controls.Add(LowToHigh);
+            SumUp = CreateButton("Sum up", Game2Pos, Const.GameSquareWidth, Const.GameSquareHeight, forecolor, backcolor, f1);
+            SumUp.Click += new EventHandler(MainMenu);
+            Controls.Add(SumUp);
             //create Color read button
             ColorRead = CreateButton("Color Read", Game3Pos, Const.GameSquareWidth, Const.GameSquareHeight, forecolor, backcolor, f1);
             ColorRead.Click += new EventHandler(MainMenu);
@@ -213,7 +214,7 @@ namespace Brain
         {
             Controls.Remove(Statistics);
             Controls.Remove(PathFinding);
-            Controls.Remove(LowToHigh);
+            Controls.Remove(SumUp);
             Controls.Remove(ColorRead);
             Controls.Remove(PartialMatch);
         }
@@ -369,7 +370,7 @@ namespace Brain
                     pfGame.EvalScore();
                     Invalidate();
                     Program.WaitSec(2); // aesthetics
-                    if (numOfPuzzlesPlayed < 1) // repeat if 10 puzzles weren't played
+                    if (numOfPuzzlesPlayed < maxPuzzles) // repeat if 10 puzzles weren't played
                     {
                         ResetPF(numOfPuzzlesPlayed);
                     }
@@ -391,7 +392,15 @@ namespace Brain
             numOfPuzzlesPlayed += 1;
 
             // initialize game
-            pfGame = new Game1(r.Next(6, 9));
+            // first half of one sesion will be easier (smaller puzzles), and second half will be harder
+            if (numOfPuzzlesPlayed <= maxPuzzles / 2) 
+            {
+                pfGame = new Game1(r.Next(5, 8));
+            }
+            else
+            {
+                pfGame = new Game1(r.Next(7, 10));
+            }
             pfGame.userPath.Add(pfGame.graph.start);
 
             DrawGrid(g);
