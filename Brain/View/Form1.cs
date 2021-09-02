@@ -33,6 +33,9 @@ namespace Brain
             LineAlignment = StringAlignment.Center,
             Alignment = StringAlignment.Center
         };
+
+        Random r = new Random();
+
         Point Center = new Point
         {
             X = Const.WindowWidth / 2,
@@ -63,6 +66,10 @@ namespace Brain
         bool drawHitWalls = false;
 
         int numOfPuzzlesPlayed = 0;
+        #endregion
+
+        #region Sum Up global variables
+        SumUp suGame = new SumUp(1);
         #endregion
         public Form1()
         {
@@ -185,7 +192,7 @@ namespace Brain
             Controls.Add(PathFinding);
             //create Low to High button
             SumUp = CreateButton("Sum up", Game2Pos, Const.GameSquareWidth, Const.GameSquareHeight, forecolor, backcolor, f1);
-            SumUp.Click += new EventHandler(MainMenu);
+            SumUp.Click += new EventHandler(OnSumUpClick);
             Controls.Add(SumUp);
             //create Color read button
             ColorRead = CreateButton("Color Read", Game3Pos, Const.GameSquareWidth, Const.GameSquareHeight, forecolor, backcolor, f1);
@@ -202,6 +209,12 @@ namespace Brain
         {
             RemoveOnPlayClickButtons();
             current = Const.PathFinding;
+            Invalidate();
+        }
+        public void OnSumUpClick(object sender, EventArgs args)
+        {
+            RemoveOnPlayClickButtons();
+            current = Const.SumUp;
             Invalidate();
         }
         public void OnStatisticsClick(object sender, EventArgs args)
@@ -244,7 +257,7 @@ namespace Brain
             }
             else if (current == Const.PathFinding)
             {
-                if (addSquare || drawHitWalls)
+                if (addSquare || drawHitWalls) // if we are continuing on current puzzle
                 {
                     DrawGrid(g);
                     DrawStartAndEnd(g);
@@ -257,10 +270,14 @@ namespace Brain
                     }
                     addSquare = false;
                 }
-                else
+                else // otherwise we generate a new one
                 {
                     PathFindingOnePuzzle(g);
                 }
+            }
+            else if (current == Const.SumUp)
+            {
+                SumUpOneRound(g);
             }
         }
         protected override void OnMouseDown(MouseEventArgs e)
@@ -340,7 +357,6 @@ namespace Brain
         void DrawStatistics(Graphics g)
         {
             ExitButton();
-           
         }
         #endregion
         #region Path Finding View
@@ -386,7 +402,6 @@ namespace Brain
         }
         void PathFindingOnePuzzle(Graphics g)
         {
-            Random r = new Random();
             pfGame.userPath = new List<MyPoint>();
             pfGame.wallsHit = new List<MyPoint>();
             numOfPuzzlesPlayed += 1;
@@ -513,6 +528,28 @@ namespace Brain
             pfGame.wallsHit.Clear();
 
             numOfPuzzlesPlayed = n;
+        }
+        #endregion
+
+        #region Sum Up View
+        void SuGameControls(MouseEventArgs e)
+        {
+           
+        }
+        void SumUpOneRound(Graphics g)
+        {
+            suGame = new SumUp(r.Next(15,35));
+            int num = suGame.number;
+            int squareSize = 120;
+            Point numUpperLeft = new Point
+            (
+            Center.X - squareSize / 2,
+            Center.Y - Const.WindowHeight / 4 - squareSize / 2
+            );
+            Rectangle rect = new Rectangle(numUpperLeft.X, numUpperLeft.Y, squareSize, squareSize);
+            g.FillRectangle(Brushes.Navy, rect);
+            g.DrawRectangle(p, rect);
+            g.DrawString(num.ToString(), f1, Brushes.Plum, numUpperLeft.X + squareSize / 2, numUpperLeft.Y + squareSize / 2, format);
         }
         #endregion
     }

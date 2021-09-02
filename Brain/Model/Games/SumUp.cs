@@ -1,13 +1,14 @@
 ﻿namespace Brain.Model
 {
-    class SumUp
+    public class SumUp : Games
     {
-        readonly int number;
-        readonly int[] sum;
+        public readonly int number;
+        public readonly int[] sum;
         public SumUp(int n)
         {
             number = n;
             sum = number.Split().ToArray();
         }
+        public override void EvalScore() { }
     }
 }
