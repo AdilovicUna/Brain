@@ -29,7 +29,7 @@ namespace Brain.Model
             (
                 // 0 on the grid represent empty spots, 1 represents a mine, 2 represent start and end.
                 // the path can be drawn from start to end or vice versa, so there is no reason to differentiate their numerical values on the grid
-                new int[size][],
+                new int[size,size],
                 new MyPoint(r.Next(0, size), r.Next(0, size)),
                 new MyPoint(r.Next(0, size), r.Next(0, size)),
                 size
@@ -45,7 +45,6 @@ namespace Brain.Model
             double value;
             for (int i = 0; i < size; i++)
             {
-                g.grid[i] = new int[size];
                 for (int j = 0; j < size; j++)
                 {
                     MyPoint temp = new MyPoint(i, j);
@@ -54,14 +53,14 @@ namespace Brain.Model
                         value = r.NextDouble();
                         if (value > 0.7)
                         {
-                            g.grid[i][j] = 1;
+                            g.grid[i,j] = 1;
                         }
                     }
                 }
             }
             //place start and end
-            g.grid[g.start.i][g.start.j] = 2;
-            g.grid[g.end.i][g.end.j] = 2;
+            g.grid[g.start.i,g.start.j] = 2;
+            g.grid[g.end.i,g.end.j] = 2;
 
             return g;
         }

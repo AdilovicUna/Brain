@@ -4,13 +4,13 @@ namespace Brain.Model
 {
     public class Graph
     {
-        public int[][] grid;
+        public int[,] grid;
         public MyPoint start;
         public MyPoint end;
 
         public int gridSize;
 
-        public Graph(int[][] g, MyPoint s, MyPoint e, int size)
+        public Graph(int[,] g, MyPoint s, MyPoint e, int size)
         {
             grid = g;
             start = s;
@@ -54,7 +54,7 @@ namespace Brain.Model
         public bool IsWall(MyPoint p, Graph g)
         {
             // walls are marked with a number 1
-            if (g.grid[p.i][p.j] == 1)
+            if (g.grid[p.i,p.j] == 1)
             {
                 return true;
             }

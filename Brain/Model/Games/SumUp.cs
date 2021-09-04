@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 
 namespace Brain.Model
@@ -6,7 +7,8 @@ namespace Brain.Model
     public class SumUp : Games
     {
         public readonly int number;
-        public readonly int[] sum;
+        public readonly int[,] sum;
+        public int correctAnswers = 0;
         public SumUp(int n)
         {
             number = n;
@@ -24,9 +26,16 @@ namespace Brain.Model
                 temp.Add(r.Next(1, number - number/4));
             }
 
-            // our array is ready
-            sum = temp.ToArray();
+            // shuffle the elements
+            temp.OrderBy(item => r.Next());
+
+            // convert the temp list to an int[,]
+            sum = temp.ListTo2DArray(4,3);
+
         }
-        public override void EvalScore() { }
+        public override void EvalScore()
+        {
+            score = correctAnswers * 100;
+        }
     }
 }

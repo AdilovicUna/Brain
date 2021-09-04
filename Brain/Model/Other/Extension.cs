@@ -26,5 +26,19 @@ namespace Brain.Model
                 }
             }
         }
+        public static T[,] ListTo2DArray<T>(this List<T> l, int rows, int columns)
+        {
+            T[,] result = new T[rows, columns];
+            int index = 0;
+            for (int i = 0; i < rows; i++)
+            {
+                for (int j = 0; j < columns; j++)
+                {
+                    result[i, j] = l[index];
+                    index++;
+                }
+            }
+            return result;
+        }
     }
 }
