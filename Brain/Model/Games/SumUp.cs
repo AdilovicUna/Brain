@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
+using Brain;
 
 namespace Brain.Model
 {
@@ -8,7 +9,6 @@ namespace Brain.Model
     {
         public readonly int number;
         public readonly int[,] sum;
-        public int correctAnswers = 0;
         public SumUp(int n)
         {
             number = n;
@@ -35,7 +35,7 @@ namespace Brain.Model
         }
         public override void EvalScore()
         {
-            score = correctAnswers * 100;
+            score = Form1.suCorrectAnswers * 100;
         }
     }
 }

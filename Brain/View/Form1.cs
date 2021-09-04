@@ -73,9 +73,12 @@ namespace Brain
         SumUp suGame = new SumUp(1);
         readonly int suSquareSize = 120;
         readonly int suMargin = 30;
+        public static int suCorrectAnswers = 0;
         int suUserSum = 0;
         Point suNumUpperLeft;
         Point suSumUpperLeft;
+        Point suClicked;
+        List<Point> suAllClicked = new List<Point>();
 
         #endregion
         public Form1()
@@ -292,13 +295,16 @@ namespace Brain
         // open and close username box
         void OpenUsernameBox()
         {
-            editBox = new TextBox
+            if(current == Const.FirstWindow)
             {
-                Font = f1
-            };
-            editBox.SetBounds(UsernameBoxPos.X, UsernameBoxPos.Y, Const.UsernameWidth, Const.UsernameHeight);
-            Controls.Add(editBox);
-            editBox.Focus();
+                editBox = new TextBox
+                {
+                    Font = f1
+                };
+                editBox.SetBounds(UsernameBoxPos.X, UsernameBoxPos.Y, Const.UsernameWidth, Const.UsernameHeight);
+                Controls.Add(editBox);
+                editBox.Focus();
+            }
         }
         void CloseUsernameBoX()
         {
@@ -560,34 +566,37 @@ namespace Brain
         }
         void SuOnMouseDown(MouseEventArgs e)
         {
-            if (SuIsValidSquare(e, out (int, int) pos))
+            MessageBox.Show("1");
+            if (SuIsValidSquare(e))
             {
-                suUserSum += suGame.sum[pos.Item1, pos.Item2];
+            MessageBox.Show("2");
+                suUserSum += suGame.sum[suClicked.X, suClicked.Y];
+                suAllClicked.Add(suClicked);
+                if (suUserSum == suGame.number)
+                {
+                    suCorrectAnswers += 1;
+                    suUserSum = 0;
+                }
+                else if (suUserSum > suGame.number)
+                {
+                    suGame.EvalScore();
+                    user.StoreData("Sum up", Games.score);
+                    current = Const.Score;
+                    SuReset();
+                }
                 Invalidate();
             }
         }
         void SuOnPaint(Graphics g)
         {
-            if (suUserSum == 0)
-            {
-                SumUpOneRound(g);
-            }
-            else if(suUserSum == suGame.number)
-            {
-                suGame.correctAnswers += 1;
-                SumUpOneRound(g);
-            }
-            else if (suUserSum > suGame.number)
-            {
-                //SumUpOneRound(g);
-                user.StoreData("Sum up", Games.score);
-                current = Const.Score;
-                SuReset();
-            }
-            else
+            if(suUserSum != 0 && suUserSum < suGame.number)
             {
                 SuDrawNumber(g);
                 SuDrawSum(g);
+            }
+            else
+            {
+                SumUpOneRound(g);
             }
         }
         Point SuSumUpperLeftInitialValue()
@@ -619,7 +628,15 @@ namespace Brain
             {
                 for (int j = 0; j < 3; j++)
                 {
-                    SuDrawOneSquare(g, suSumUpperLeft, suGame.sum[i, j], brushes[i]);
+                    if (suAllClicked.Contains(new Point(i, j))) // shade already selected squares
+                    {
+                        SuDrawOneSquare(g, suSumUpperLeft, suGame.sum[i, j], Brushes.LightSteelBlue);
+
+                    }
+                    else
+                    {
+                        SuDrawOneSquare(g, suSumUpperLeft, suGame.sum[i, j], brushes[i]);
+                    }
                     suSumUpperLeft.Y += suSquareSize + suMargin;
                 }
                 suSumUpperLeft.X += suSquareSize + suMargin;
@@ -633,16 +650,16 @@ namespace Brain
             g.DrawRectangle(p, rect);
             g.DrawString(i.ToString(), f1, Brushes.Plum, upperLeft.X + suSquareSize / 2, upperLeft.Y + suSquareSize / 2, format);
         }
-        bool SuIsValidSquare(MouseEventArgs e, out (int,int) pos)
+        bool SuIsValidSquare(MouseEventArgs e)
         {
-            pos = (-1, -1);
             for (int i = 0; i < 4; i++)
             {
                 for (int j = 0; j < 3; j++)
                 {
-                    if (e.X > suSumUpperLeft.X && e.X < suSumUpperLeft.X + 120 && e.Y > suSumUpperLeft.Y && e.Y < suSumUpperLeft.Y + 120)
+                    suClicked = new Point(i, j);
+                    if (e.X > suSumUpperLeft.X && e.X < suSumUpperLeft.X + 120 && e.Y > suSumUpperLeft.Y && e.Y < suSumUpperLeft.Y + 120
+                        && !suAllClicked.Contains(suClicked))
                     {
-                        pos = (i, j);
                         suSumUpperLeft = SuSumUpperLeftInitialValue();
                         return true;
                     }
@@ -657,7 +674,8 @@ namespace Brain
         void SuReset()
         {
             suUserSum = 0;
-            suGame.correctAnswers = 0;
+            suCorrectAnswers = 0;
+            suAllClicked.Clear();
         }
         #endregion
     }
