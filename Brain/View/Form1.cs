@@ -28,13 +28,14 @@ namespace Brain
         readonly Pen p = new Pen(Color.Black, 2);
         readonly Font f1 = new Font("Times New Roman", 30);
         readonly Font f2 = new Font("Times New Roman", 20);
+        readonly Font bigFont = new Font("Times New Roman", 100);
         readonly StringFormat format = new StringFormat
         {
             LineAlignment = StringAlignment.Center,
             Alignment = StringAlignment.Center
         };
 
-        Random r = new Random();
+        readonly Random r = new Random();
 
         Point Center = new Point
         {
@@ -55,21 +56,25 @@ namespace Brain
 
         #region Path Finding global variables
         Game1 pfGame = new Game1(6);
-        readonly int oneSquareSize = 70;
-        readonly int maxPuzzles = 1;
+        readonly int pfOneSquareSize = 70;
+        readonly int pfMaxPuzzles = 1;
 
         Point pfUpperLeft;
-        int drawnGridSize;
+        int pfDrawnGridSize;
 
-        bool addSquare = false;
-        bool wallsHidden = false;
-        bool drawHitWalls = false;
+        bool pfAddSquare = false;
+        bool pfWwallsHidden = false;
+        bool pfDrawHitWalls = false;
 
-        int numOfPuzzlesPlayed = 0;
+        int pfNumOfPuzzlesPlayed = 0;
         #endregion
 
         #region Sum Up global variables
         SumUp suGame = new SumUp(1);
+        readonly int suSquareSize = 120;
+        int suUserSum = 0;
+        Point suNumUpperLeft;
+
         #endregion
         public Form1()
         {
@@ -257,18 +262,18 @@ namespace Brain
             }
             else if (current == Const.PathFinding)
             {
-                if (addSquare || drawHitWalls) // if we are continuing on current puzzle
+                if (pfAddSquare || pfDrawHitWalls) // if we are continuing on current puzzle
                 {
-                    DrawGrid(g);
-                    DrawStartAndEnd(g);
-                    DrawListOfPoints(g, pfGame.userPath, Brushes.Aquamarine);
-                    if (drawHitWalls)
+                    PfDrawGrid(g);
+                    PfDrawStartAndEnd(g);
+                    PfDrawListOfPoints(g, pfGame.userPath, Brushes.Aquamarine);
+                    if (pfDrawHitWalls)
                     {
-                        DrawWalls(g, Brushes.Crimson);
-                        DrawListOfPoints(g, pfGame.wallsHit, Brushes.LightSeaGreen);
-                        drawHitWalls = false;
+                        PfDrawWalls(g, Brushes.Crimson);
+                        PfDrawListOfPoints(g, pfGame.wallsHit, Brushes.LightSeaGreen);
+                        pfDrawHitWalls = false;
                     }
-                    addSquare = false;
+                    pfAddSquare = false;
                 }
                 else // otherwise we generate a new one
                 {
@@ -282,7 +287,7 @@ namespace Brain
         }
         protected override void OnMouseDown(MouseEventArgs e)
         {
-            if (current == Const.PathFinding && wallsHidden) // no need to click anything in this game if walls arent hidden
+            if (current == Const.PathFinding && pfWwallsHidden) // no need to click anything in this game if walls arent hidden
             {
                 PfGameControls(e);
             }
@@ -343,8 +348,7 @@ namespace Brain
                 X = Center.X - (500 / 2) - 100,
                 Y = Center.Y - (500 / 2) + 100
             };
-            Font font = new Font("Times New Roman", 100);
-            g.DrawString("Score: " + Games.score.ToString(), font, Brushes.Lavender, UpperLeft.X, UpperLeft.Y);
+            g.DrawString("Score: " + Games.score.ToString(), bigFont, Brushes.Lavender, UpperLeft.X, UpperLeft.Y);
         }
 
 
@@ -352,7 +356,8 @@ namespace Brain
 
         // GAME REQUIREMENTS:
         // Each game has to have 5 main things: model (in a separate file), controls, score eval function, general drawing and a reset function
-        // If a new game is added, NumberOfGames from the ViewConstants.cs file should be updated.
+        // all functions related to the new game should start with an abbreviation for that game.
+        // eg. all Path finding related functions start with Pf
         #region Statistics
         void DrawStatistics(Graphics g)
         {
@@ -365,14 +370,14 @@ namespace Brain
         {
             MyPoint square = new MyPoint // derermine which square was clicked
             (
-                (e.Y - pfUpperLeft.Y) / oneSquareSize,
-                (e.X - pfUpperLeft.X) / oneSquareSize
+                (e.Y - pfUpperLeft.Y) / pfOneSquareSize,
+                (e.X - pfUpperLeft.X) / pfOneSquareSize
             );
 
 
-            if (IsValidSquare(e, square))
+            if (PfIsValidSquare(e, square))
             {
-                addSquare = true;
+                pfAddSquare = true;
                 pfGame.userPath.Add(square);
 
                 if (pfGame.graph.grid[square.i][square.j] == 1) // if square is a wall
@@ -382,19 +387,19 @@ namespace Brain
 
                 if (square.IsConnectedTo(pfGame.graph.end)) // our starting and ending points are connected with a path
                 {
-                    drawHitWalls = true;
+                    pfDrawHitWalls = true;
                     pfGame.EvalScore();
                     Invalidate();
                     Program.WaitSec(2); // aesthetics
-                    if (numOfPuzzlesPlayed < maxPuzzles) // repeat if 10 puzzles weren't played
+                    if (pfNumOfPuzzlesPlayed < pfMaxPuzzles) // repeat if 10 puzzles weren't played
                     {
-                        ResetPF(numOfPuzzlesPlayed);
+                        PfReset(pfNumOfPuzzlesPlayed);
                     }
                     else // if they were, show the score, reset and exit
                     {
                         user.StoreData("Path Finding", Games.score);
                         current = Const.Score;
-                        ResetPF(0);
+                        PfReset(0);
                     }
                 }
                 Invalidate();
@@ -404,11 +409,11 @@ namespace Brain
         {
             pfGame.userPath = new List<MyPoint>();
             pfGame.wallsHit = new List<MyPoint>();
-            numOfPuzzlesPlayed += 1;
+            pfNumOfPuzzlesPlayed += 1;
 
             // initialize game
             // first half of one sesion will be easier (smaller puzzles), and second half will be harder
-            if (numOfPuzzlesPlayed <= maxPuzzles / 2) 
+            if (pfNumOfPuzzlesPlayed <= pfMaxPuzzles / 2) 
             {
                 pfGame = new Game1(r.Next(5, 8));
             }
@@ -418,49 +423,49 @@ namespace Brain
             }
             pfGame.userPath.Add(pfGame.graph.start);
 
-            DrawGrid(g);
+            PfDrawGrid(g);
 
             // draw walls
-            DrawWalls(g, Brushes.Crimson);
+            PfDrawWalls(g, Brushes.Crimson);
 
-            wallsHidden = false;
+            pfWwallsHidden = false;
 
             // let the user memorize the placement of the walls
             Program.WaitSec(4);
 
             // delete walls by redrawing them with different color
-            DrawWalls(g, WindowBrush);
+            PfDrawWalls(g, WindowBrush);
 
-            wallsHidden = true;
+            pfWwallsHidden = true;
 
-            DrawStartAndEnd(g);
+            PfDrawStartAndEnd(g);
         }
-        void DrawGrid(Graphics g)
+        void PfDrawGrid(Graphics g)
         {
             // draw the outline of the square
-            drawnGridSize = oneSquareSize * pfGame.graph.gridSize;
+            pfDrawnGridSize = pfOneSquareSize * pfGame.graph.gridSize;
 
             pfUpperLeft = new Point
             {
-                X = Center.X - (drawnGridSize / 2),
-                Y = Center.Y - (drawnGridSize / 2)
+                X = Center.X - (pfDrawnGridSize / 2),
+                Y = Center.Y - (pfDrawnGridSize / 2)
             };
-            Rectangle rect = new Rectangle(pfUpperLeft.X, pfUpperLeft.Y, drawnGridSize, drawnGridSize);
+            Rectangle rect = new Rectangle(pfUpperLeft.X, pfUpperLeft.Y, pfDrawnGridSize, pfDrawnGridSize);
             g.DrawRectangle(p, rect);
 
             // draw the grid inside
-            for (int i = 0; i <= drawnGridSize; i += oneSquareSize)
+            for (int i = 0; i <= pfDrawnGridSize; i += pfOneSquareSize)
             {
                 Point fromVertical = new Point(pfUpperLeft.X + i, pfUpperLeft.Y);
-                Point toVertical = new Point(pfUpperLeft.X + i, pfUpperLeft.Y + drawnGridSize);
+                Point toVertical = new Point(pfUpperLeft.X + i, pfUpperLeft.Y + pfDrawnGridSize);
                 g.DrawLine(p, fromVertical, toVertical);
 
                 Point fromHorizontal = new Point(pfUpperLeft.X, pfUpperLeft.Y + i);
-                Point toHorizontal = new Point(pfUpperLeft.X + drawnGridSize, pfUpperLeft.Y + i);
+                Point toHorizontal = new Point(pfUpperLeft.X + pfDrawnGridSize, pfUpperLeft.Y + i);
                 g.DrawLine(p, fromHorizontal, toHorizontal);
             }
         }
-        void DrawWalls(Graphics g, Brush b)
+        void PfDrawWalls(Graphics g, Brush b)
         {
             for (int i = 0; i < pfGame.graph.gridSize; i++)
             {
@@ -468,66 +473,66 @@ namespace Brain
                 {
                     if (pfGame.graph.grid[i][j] == 1)
                     {
-                        Rectangle rect = new Rectangle(pfUpperLeft.X + (oneSquareSize * j), pfUpperLeft.Y + (oneSquareSize * i), oneSquareSize, oneSquareSize);
+                        Rectangle rect = new Rectangle(pfUpperLeft.X + (pfOneSquareSize * j), pfUpperLeft.Y + (pfOneSquareSize * i), pfOneSquareSize, pfOneSquareSize);
                         g.FillRectangle(b, rect);
                         g.DrawRectangle(p, rect);
                     }
                 }
             }
         }
-        void DrawStartAndEnd(Graphics g)
+        void PfDrawStartAndEnd(Graphics g)
         {
             MyPoint start = pfGame.graph.start;
             MyPoint end = pfGame.graph.end;
-            Rectangle rect = new Rectangle(pfUpperLeft.X + (oneSquareSize * start.j), pfUpperLeft.Y + (oneSquareSize * start.i), oneSquareSize, oneSquareSize);
+            Rectangle rect = new Rectangle(pfUpperLeft.X + (pfOneSquareSize * start.j), pfUpperLeft.Y + (pfOneSquareSize * start.i), pfOneSquareSize, pfOneSquareSize);
             g.FillRectangle(Brushes.PapayaWhip, rect);
             g.DrawRectangle(p, rect);
-            g.DrawString("S", f1, Brushes.Plum, (pfUpperLeft.X + (oneSquareSize * start.j)) + oneSquareSize / 2, (pfUpperLeft.Y + (oneSquareSize * start.i)) + oneSquareSize / 2, format);
+            g.DrawString("S", f1, Brushes.Plum, (pfUpperLeft.X + (pfOneSquareSize * start.j)) + pfOneSquareSize / 2, (pfUpperLeft.Y + (pfOneSquareSize * start.i)) + pfOneSquareSize / 2, format);
 
-            rect = new Rectangle(pfUpperLeft.X + (oneSquareSize * end.j), pfUpperLeft.Y + (oneSquareSize * end.i), oneSquareSize, oneSquareSize);
+            rect = new Rectangle(pfUpperLeft.X + (pfOneSquareSize * end.j), pfUpperLeft.Y + (pfOneSquareSize * end.i), pfOneSquareSize, pfOneSquareSize);
             g.FillRectangle(Brushes.PapayaWhip, rect);
             g.DrawRectangle(p, rect);
-            g.DrawString("E", f1, Brushes.Plum, (pfUpperLeft.X + (oneSquareSize * end.j)) + oneSquareSize / 2, (pfUpperLeft.Y + (oneSquareSize * end.i)) + oneSquareSize / 2, format);
+            g.DrawString("E", f1, Brushes.Plum, (pfUpperLeft.X + (pfOneSquareSize * end.j)) + pfOneSquareSize / 2, (pfUpperLeft.Y + (pfOneSquareSize * end.i)) + pfOneSquareSize / 2, format);
         }
-        void DrawListOfPoints(Graphics g, List<MyPoint> l, Brush b)
+        void PfDrawListOfPoints(Graphics g, List<MyPoint> l, Brush b)
         {
             Rectangle rect;
             foreach (MyPoint entry in l)
             {
                 if (!entry.Equals(pfGame.graph.start) && !entry.Equals(pfGame.graph.end))
                 {
-                    rect = new Rectangle(pfUpperLeft.X + (oneSquareSize * entry.j), pfUpperLeft.Y + (oneSquareSize * entry.i), oneSquareSize, oneSquareSize);
+                    rect = new Rectangle(pfUpperLeft.X + (pfOneSquareSize * entry.j), pfUpperLeft.Y + (pfOneSquareSize * entry.i), pfOneSquareSize, pfOneSquareSize);
                     g.FillRectangle(b, rect);
                     g.DrawRectangle(p, rect);
                 }
             }
         }
-        bool IsValidSquare(MouseEventArgs e, MyPoint square)
+        bool PfIsValidSquare(MouseEventArgs e, MyPoint square)
         {
-            if (IsInsideGrid(e) && square.IsConnectedTo(pfGame.userPath[^1]))
+            if (PfIsInsideGrid(e) && square.IsConnectedTo(pfGame.userPath[^1]))
             {
                 return true;
             }
             return false;
         }
-        bool IsInsideGrid(MouseEventArgs e)
+        bool PfIsInsideGrid(MouseEventArgs e)
         {
-            if (e.X > pfUpperLeft.X && e.X < pfUpperLeft.X + drawnGridSize && e.Y > pfUpperLeft.Y && e.Y < pfUpperLeft.Y + drawnGridSize)
+            if (e.X > pfUpperLeft.X && e.X < pfUpperLeft.X + pfDrawnGridSize && e.Y > pfUpperLeft.Y && e.Y < pfUpperLeft.Y + pfDrawnGridSize)
             {
                 return true;
             }
             return false;
         }
-        void ResetPF(int n)
+        void PfReset(int n)
         {
-            addSquare = false;
-            wallsHidden = false;
-            drawHitWalls = false;
+            pfAddSquare = false;
+            pfWwallsHidden = false;
+            pfDrawHitWalls = false;
 
             pfGame.userPath.Clear();
             pfGame.wallsHit.Clear();
 
-            numOfPuzzlesPlayed = n;
+            pfNumOfPuzzlesPlayed = n;
         }
         #endregion
 
@@ -540,16 +545,51 @@ namespace Brain
         {
             suGame = new SumUp(r.Next(15,35));
             int num = suGame.number;
-            int squareSize = 120;
-            Point numUpperLeft = new Point
+
+            // draw number
+            suNumUpperLeft = new Point
             (
-            Center.X - squareSize / 2,
-            Center.Y - Const.WindowHeight / 4 - squareSize / 2
+                Center.X - suSquareSize / 2,
+                Center.Y - Const.WindowHeight / 4 - suSquareSize / 2 - 50 // quater of the screen and -50 to make it look nicer
             );
-            Rectangle rect = new Rectangle(numUpperLeft.X, numUpperLeft.Y, squareSize, squareSize);
-            g.FillRectangle(Brushes.Navy, rect);
+            g.DrawString(num.ToString(), bigFont, Brushes.Navy, suNumUpperLeft.X + suSquareSize / 2, suNumUpperLeft.Y + suSquareSize / 2, format);
+
+            // draw sum
+            Point sumUpperLeft = new Point
+            (
+                Center.X - 285, // squareSize * 4 + 30 (space between) * 3 = 285
+                suNumUpperLeft.Y + 100 
+            );
+
+            // colors at random
+            Brush[] brushes = new Brush[] { Brushes.CadetBlue, Brushes.Crimson, Brushes.SeaGreen, Brushes.DarkViolet, Brushes.RoyalBlue, Brushes.Magenta };
+
+            int index = 0;
+
+            // draw the sum in 4 rows and 3 columns
+            for(int i = 0; i < 4; i++)
+            {
+                for(int j = 0; j < 3; j++)
+                {
+                    sumUpperLeft.Y += 150;
+                    SuDrawOneSquare(g, sumUpperLeft, suGame.sum[index], brushes[r.Next(0, brushes.Length)]);
+                    index++;
+                }
+                sumUpperLeft.X += 150;
+                sumUpperLeft.Y -= 150 * 3;
+            }
+        }
+        void SuDrawOneSquare(Graphics g, Point upperLeft, int i, Brush b)
+        {
+            Rectangle rect = new Rectangle(upperLeft.X, upperLeft.Y, suSquareSize, suSquareSize);
+            g.FillRectangle(b, rect);
             g.DrawRectangle(p, rect);
-            g.DrawString(num.ToString(), f1, Brushes.Plum, numUpperLeft.X + squareSize / 2, numUpperLeft.Y + squareSize / 2, format);
+            g.DrawString(i.ToString(), f1, Brushes.Plum, upperLeft.X + suSquareSize / 2, upperLeft.Y + suSquareSize / 2, format);
+        }
+
+        bool SuIsValidSquare(MouseEventArgs e)
+        {
+
         }
         #endregion
     }
