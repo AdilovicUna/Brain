@@ -11,14 +11,14 @@ namespace Brain.Model
 
         public Game1(int size)
         {
-            Random r = new Random();
+            Random random = new Random();
 
-            Graph g = ConstructGrid(size, r);
+            Graph g = ConstructGrid(size, random);
 
             // keep generating grids until one of them has at least 3 paths from the starting to ending points
             while (!ExistMinThreePaths(g))
             {
-                g = ConstructGrid(size, r);
+                g = ConstructGrid(size, random);
             }
             graph = g;
         }

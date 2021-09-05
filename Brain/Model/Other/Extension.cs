@@ -7,13 +7,13 @@ namespace Brain.Model
     {
         public static List<int> Split(this int n)
         {
-            Random r = new Random();
+            Random random = new Random();
             List<int> result = new List<int>();
             int totalLeft = n;
             int subtract;
             while (true)
             {
-                subtract = r.Next(1, totalLeft);
+                subtract = random.Next(1, totalLeft);
                 if (totalLeft - subtract == 0)
                 {
                     result.Add(subtract);

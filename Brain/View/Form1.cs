@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using System.IO;
+using System.Diagnostics;
 using ViewConstants;
 using Brain.Model;
 
@@ -35,7 +36,8 @@ namespace Brain
             Alignment = StringAlignment.Center
         };
 
-        readonly Random r = new Random();
+        readonly Stopwatch stopwatch = new Stopwatch();
+        readonly Random random = new Random();
 
         Point Center = new Point
         {
@@ -46,7 +48,7 @@ namespace Brain
         int current = Const.FirstWindow;
         bool newUser = false;
 
-        User user = new User();
+        readonly User user = new User();
         #endregion
 
         #region UsernameBox global variables
@@ -73,12 +75,12 @@ namespace Brain
         SumUp suGame = new SumUp(1);
         readonly int suSquareSize = 120;
         readonly int suMargin = 30;
+        readonly List<Point> suAllClicked = new List<Point>();
         public static int suCorrectAnswers = 0;
         int suUserSum = 0;
         Point suNumUpperLeft;
         Point suSumUpperLeft;
         Point suClicked;
-        List<Point> suAllClicked = new List<Point>();
 
         #endregion
         public Form1()
@@ -225,6 +227,7 @@ namespace Brain
         {
             RemoveOnPlayClickButtons();
             current = Const.SumUp;
+            stopwatch.Start();
             Invalidate();
         }
         public void OnStatisticsClick(object sender, EventArgs args)
@@ -373,11 +376,11 @@ namespace Brain
             // first half of one sesion will be easier (smaller puzzles), and second half will be harder
             if (pfNumOfPuzzlesPlayed <= pfMaxPuzzles / 2) 
             {
-                pfGame = new Game1(r.Next(5, 8));
+                pfGame = new Game1(random.Next(5, 8));
             }
             else
             {
-                pfGame = new Game1(r.Next(7, 10));
+                pfGame = new Game1(random.Next(7, 10));
             }
             pfGame.userPath.Add(pfGame.graph.start);
 
@@ -556,12 +559,20 @@ namespace Brain
         #region Sum Up View
         void SumUpOneRound(Graphics g)
         {
-            suGame = new SumUp(r.Next(15, 35));
+            suGame = new SumUp(random.Next(15, 35));
             SuDrawNumber(g);
             SuDrawSum(g);
         }
         void SuOnMouseDown(MouseEventArgs e)
         {
+            // the game will be executed for a minute
+            if (stopwatch.Elapsed > TimeSpan.FromSeconds(60))
+            {
+                suGame.EvalScore();
+                user.StoreData("Sum up", Games.score);
+                current = Const.Score;
+                stopwatch.Stop();
+            }
             if (SuIsValidSquare(e))
             {
                 suUserSum += suGame.sum[suClicked.X, suClicked.Y];
@@ -573,9 +584,6 @@ namespace Brain
                 }
                 else if (suUserSum > suGame.number)
                 {
-                    suGame.EvalScore();
-                    user.StoreData("Sum up", Games.score);
-                    current = Const.Score;
                     SuReset(0);
                 }
                 Invalidate();

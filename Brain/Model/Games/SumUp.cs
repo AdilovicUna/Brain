@@ -20,14 +20,14 @@ namespace Brain.Model
             }
 
             // now that we have a solution we want to add some arbitrary numbers as well;
-            Random r = new Random();
+            Random random = new Random();
             while(temp.Count < 12)
             {
-                temp.Add(r.Next(1, number - number/4));
+                temp.Add(random.Next(1, number - number/4));
             }
 
             // shuffle the elements
-            temp.OrderBy(item => r.Next());
+            temp.OrderBy(item => random.Next());
 
             // convert the temp list to an int[,]
             sum = temp.ListTo2DArray(4,3);

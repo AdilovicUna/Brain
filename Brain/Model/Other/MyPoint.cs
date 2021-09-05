@@ -1,7 +1,4 @@
-﻿using System;
-using System.Windows.Forms;
-
-namespace Brain.Model
+﻿namespace Brain.Model
 {
     public class MyPoint // named like this because it overlapped with a class Point used in Form1.cs
     {
