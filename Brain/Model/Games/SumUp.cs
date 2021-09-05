@@ -35,7 +35,7 @@ namespace Brain.Model
         }
         public override void EvalScore()
         {
-            score = Form1.suCorrectAnswers * 100;
+            score = SumUpView.CorrectAnswers * 100;
         }
     }
 }
