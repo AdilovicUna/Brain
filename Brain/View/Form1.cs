@@ -557,32 +557,26 @@ namespace Brain
         void SumUpOneRound(Graphics g)
         {
             suGame = new SumUp(r.Next(15, 35));
-
             SuDrawNumber(g);
-
             SuDrawSum(g);
-            
-            suSumUpperLeft = SuSumUpperLeftInitialValue();
         }
         void SuOnMouseDown(MouseEventArgs e)
         {
-            MessageBox.Show("1");
             if (SuIsValidSquare(e))
             {
-            MessageBox.Show("2");
                 suUserSum += suGame.sum[suClicked.X, suClicked.Y];
                 suAllClicked.Add(suClicked);
                 if (suUserSum == suGame.number)
                 {
                     suCorrectAnswers += 1;
-                    suUserSum = 0;
+                    SuReset(suCorrectAnswers);
                 }
                 else if (suUserSum > suGame.number)
                 {
                     suGame.EvalScore();
                     user.StoreData("Sum up", Games.score);
                     current = Const.Score;
-                    SuReset();
+                    SuReset(0);
                 }
                 Invalidate();
             }
@@ -619,7 +613,6 @@ namespace Brain
         void SuDrawSum(Graphics g)
         {
             suSumUpperLeft = SuSumUpperLeftInitialValue();
-
             // colors at random
             Brush[] brushes = new Brush[] { Brushes.CadetBlue, Brushes.Crimson, Brushes.SeaGreen, Brushes.DarkViolet };
 
@@ -642,6 +635,7 @@ namespace Brain
                 suSumUpperLeft.X += suSquareSize + suMargin;
                 suSumUpperLeft.Y -= (suSquareSize + suMargin) * 3;
             }
+            suSumUpperLeft = SuSumUpperLeftInitialValue();
         }
         void SuDrawOneSquare(Graphics g, Point upperLeft, int i, Brush b)
         {
@@ -671,10 +665,10 @@ namespace Brain
             suSumUpperLeft = SuSumUpperLeftInitialValue();
             return false;
         }
-        void SuReset()
+        void SuReset(int n)
         {
             suUserSum = 0;
-            suCorrectAnswers = 0;
+            suCorrectAnswers = n;
             suAllClicked.Clear();
         }
         #endregion
