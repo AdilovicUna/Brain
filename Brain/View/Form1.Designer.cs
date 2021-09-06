@@ -39,21 +39,21 @@ namespace Brain
         #endregion
 
         #region General global variables
-        readonly Color WindowColor = Color.Thistle;
-        readonly Brush WindowBrush = Brushes.Thistle;
-        readonly Pen p = new Pen(Color.Black, 2);
-        readonly Font f1 = new Font("Times New Roman", 30);
-        readonly Font f2 = new Font("Times New Roman", 20);
-        readonly Font bigFont = new Font("Times New Roman", 100);
-        readonly StringFormat format = new StringFormat
+        public static readonly Color WindowColor = Color.Thistle;
+        public static readonly Brush WindowBrush = Brushes.Thistle;
+        public static readonly Pen p = new Pen(Color.Black, 2);
+        public static readonly Font f1 = new Font("Times New Roman", 30);
+        public static readonly Font f2 = new Font("Times New Roman", 20);
+        public static readonly Font bigFont = new Font("Times New Roman", 100);
+        public static readonly StringFormat format = new StringFormat
         {
             LineAlignment = StringAlignment.Center,
             Alignment = StringAlignment.Center
         };
 
-        readonly Random random = new Random();
+        public static readonly Random random = new Random();
 
-        Point Center = new Point
+        public static Point Center = new Point
         {
             X = Const.WindowWidth / 2,
             Y = Const.WindowHeight / 2
@@ -62,7 +62,7 @@ namespace Brain
         int current = Const.FirstWindow;
         bool newUser = false;
 
-        readonly User user = new User();
+        public readonly User user = new User();
         #endregion
 
         #region UsernameBox global variables

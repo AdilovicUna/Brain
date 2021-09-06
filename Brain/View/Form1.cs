@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using System.IO;
@@ -10,8 +9,8 @@ namespace Brain
 {
     public partial class Form1 : Form
     {
-        readonly PathFindingView pf = new PathFindingView();
-        readonly SumUpView su = new SumUpView();
+        readonly PathFindingView pathFinding = new PathFindingView();
+        readonly SumUpView sumUp = new SumUpView();
         public Form1()
         {
             InitializeComponent();
@@ -38,7 +37,7 @@ namespace Brain
             Controls.Add(Play);
 
             // Timers
-            su.Timer.Tick += new EventHandler(OnSuTimerEvent);
+            sumUp.Timer.Tick += new EventHandler(OnSuTimerEvent);
         }
 
         #region Buttons
@@ -76,7 +75,6 @@ namespace Brain
             newUser = false;
             Invalidate();
         }
-
         public void MainMenu(object sender, EventArgs args)
         {
             CloseUsernameBoX();
@@ -159,7 +157,7 @@ namespace Brain
         {
             RemoveOnPlayClickButtons();
             current = Const.SumUp;
-            su.Timer.Start();
+            sumUp.Timer.Start();
             Invalidate();
         }
         public void OnStatisticsClick(object sender, EventArgs args)
@@ -202,16 +200,16 @@ namespace Brain
             }
             else if (current == Const.PathFinding)
             {
-                PfOnPaint(g);
+                pathFinding.OnPaint(g);
             }
             else if (current == Const.SumUp)
             {
-                SuOnPaint(g);
+                sumUp.OnPaint(g);
             }
         }
         protected override void OnMouseDown(MouseEventArgs e)
         {
-            if (current == Const.PathFinding && pf.WallsHidden) // no need to click anything in this game if walls arent hidden
+            if (current == Const.PathFinding && pathFinding.WallsHidden) // no need to click anything in this game if walls arent hidden
             {
                 PfOnMouseDown(e);
             }
@@ -285,10 +283,6 @@ namespace Brain
 
         #endregion
 
-        // GAME REQUIREMENTS:
-        // Each game has to have 5 main things: model (in a separate file), controls for mouse down and onPaint, score eval function, general drawing and a reset function
-        // all functions and global variables related to the new game should start with an abbreviation for that game.
-        // eg. all Path finding related functions/vars start with Pf
         #region Statistics
         void DrawStatistics(Graphics g)
         {
@@ -296,328 +290,84 @@ namespace Brain
         }
         #endregion
 
+        // GAME REQUIREMENTS:
+        // Each game has to have 5 main things: model (in a separate file), controls for mouse down and onPaint, score eval function, general drawing and a reset function
+        // all functions and global variables related to the new game should start with an abbreviation for that game.
+        // eg. all Path finding related functions/vars start with Pf
+
         #region Path Finding View
-        // NOTE: x-axis corresponds to j and y-axis corresponds to i
-        void PathFindingOnePuzzle(Graphics g)
-        {
-            pf.Game.userPath = new List<MyPoint>();
-            pf.Game.wallsHit = new List<MyPoint>();
-            pf.NumOfPuzzlesPlayed += 1;
-
-            // initialize game
-            // first half of one sesion will be easier (smaller puzzles), and second half will be harder
-            if (pf.NumOfPuzzlesPlayed <= pf.MaxPuzzles / 2) 
-            {
-                pf.Game = new Game1(random.Next(5, 8));
-            }
-            else
-            {
-                pf.Game = new Game1(random.Next(7, 10));
-            }
-            pf.Game.userPath.Add(pf.Game.graph.start);
-
-            PfDrawGrid(g);
-
-            // draw walls
-            PfDrawWalls(g, Brushes.Crimson);
-
-            pf.WallsHidden = false;
-
-            // let the user memorize the placement of the walls
-            Program.WaitSec(4);
-
-            // delete walls by redrawing them with different color
-            PfDrawWalls(g, WindowBrush);
-
-            pf.WallsHidden = true;
-
-            PfDrawStartAndEnd(g);
-        }
         void PfOnMouseDown(MouseEventArgs e)
         {
             MyPoint square = new MyPoint // derermine which square was clicked
             (
-                (e.Y - pf.UpperLeft.Y) / pf.OneSquareSize,
-                (e.X - pf.UpperLeft.X) / pf.OneSquareSize
+                (e.Y - pathFinding.UpperLeft.Y) / pathFinding.OneSquareSize,
+                (e.X - pathFinding.UpperLeft.X) / pathFinding.OneSquareSize
             );
 
 
-            if (PfIsValidSquare(e, square))
+            if (pathFinding.IsValidSquare(e, square))
             {
-                pf.AddSquare = true;
-                pf.Game.userPath.Add(square);
+                pathFinding.AddSquare = true;
+                pathFinding.Game.userPath.Add(square);
 
-                if (pf.Game.graph.grid[square.i,square.j] == 1) // if square is a wall
+                if (pathFinding.Game.graph.grid[square.i, square.j] == 1) // if square is a wall
                 {
-                    pf.Game.wallsHit.Add(square);
+                    pathFinding.Game.wallsHit.Add(square);
                 }
 
-                if (square.IsConnectedTo(pf.Game.graph.end)) // our starting and ending points are connected with a path
+                if (square.IsConnectedTo(pathFinding.Game.graph.end)) // our starting and ending points are connected with a path
                 {
-                    pf.DrawHitWalls = true;
-                    pf.Game.EvalScore();
+                    pathFinding.DrawHitWalls = true;
+                    pathFinding.Game.EvalScore();
                     Invalidate();
                     Program.WaitSec(2); // aesthetics
-                    if (pf.NumOfPuzzlesPlayed < pf.MaxPuzzles) // repeat if 10 puzzles weren't played
+                    if (pathFinding.NumOfPuzzlesPlayed < pathFinding.MaxPuzzles) // repeat if 10 puzzles weren't played
                     {
-                        PfReset(pf.NumOfPuzzlesPlayed);
+                        pathFinding.Reset(pathFinding.NumOfPuzzlesPlayed);
                     }
                     else // if they were, show the score, reset and exit
                     {
                         user.StoreData("Path Finding", Games.score);
                         current = Const.Score;
-                        PfReset(0);
+                        pathFinding.Reset(0);
                     }
                 }
                 Invalidate();
             }
-        }
-        void PfOnPaint(Graphics g)
-        {
-            if (pf.AddSquare || pf.DrawHitWalls) // if we are continuing on current puzzle
-            {
-                PfDrawGrid(g);
-                PfDrawStartAndEnd(g);
-                PfDrawListOfPoints(g, pf.Game.userPath, Brushes.Aquamarine);
-                if (pf.DrawHitWalls)
-                {
-                    PfDrawWalls(g, Brushes.Crimson);
-                    PfDrawListOfPoints(g, pf.Game.wallsHit, Brushes.LightSeaGreen);
-                    pf.DrawHitWalls = false;
-                }
-                pf.AddSquare = false;
-            }
-            else // otherwise we generate a new one
-            {
-                PathFindingOnePuzzle(g);
-            }
-        }
-        void PfDrawGrid(Graphics g)
-        {
-            // draw the outline of the square
-            pf.DrawnGridSize = pf.OneSquareSize * pf.Game.graph.gridSize;
-
-            pf.UpperLeft = new Point
-            {
-                X = Center.X - (pf.DrawnGridSize / 2),
-                Y = Center.Y - (pf.DrawnGridSize / 2)
-            };
-            Rectangle rect = new Rectangle(pf.UpperLeft.X, pf.UpperLeft.Y, pf.DrawnGridSize, pf.DrawnGridSize);
-            g.DrawRectangle(p, rect);
-
-            // draw the grid inside
-            for (int i = 0; i <= pf.DrawnGridSize; i += pf.OneSquareSize)
-            {
-                Point fromVertical = new Point(pf.UpperLeft.X + i, pf.UpperLeft.Y);
-                Point toVertical = new Point(pf.UpperLeft.X + i, pf.UpperLeft.Y + pf.DrawnGridSize);
-                g.DrawLine(p, fromVertical, toVertical);
-
-                Point fromHorizontal = new Point(pf.UpperLeft.X, pf.UpperLeft.Y + i);
-                Point toHorizontal = new Point(pf.UpperLeft.X + pf.DrawnGridSize, pf.UpperLeft.Y + i);
-                g.DrawLine(p, fromHorizontal, toHorizontal);
-            }
-        }
-        void PfDrawWalls(Graphics g, Brush b)
-        {
-            for (int i = 0; i < pf.Game.graph.gridSize; i++)
-            {
-                for (int j = 0; j < pf.Game.graph.gridSize; j++)
-                {
-                    if (pf.Game.graph.grid[i,j] == 1)
-                    {
-                        Rectangle rect = new Rectangle(pf.UpperLeft.X + (pf.OneSquareSize * j), pf.UpperLeft.Y + (pf.OneSquareSize * i), pf.OneSquareSize, pf.OneSquareSize);
-                        g.FillRectangle(b, rect);
-                        g.DrawRectangle(p, rect);
-                    }
-                }
-            }
-        }
-        void PfDrawStartAndEnd(Graphics g)
-        {
-            MyPoint start = pf.Game.graph.start;
-            MyPoint end = pf.Game.graph.end;
-            Rectangle rect = new Rectangle(pf.UpperLeft.X + (pf.OneSquareSize * start.j), pf.UpperLeft.Y + (pf.OneSquareSize * start.i), pf.OneSquareSize, pf.OneSquareSize);
-            g.FillRectangle(Brushes.PapayaWhip, rect);
-            g.DrawRectangle(p, rect);
-            g.DrawString("S", f1, Brushes.Plum, (pf.UpperLeft.X + (pf.OneSquareSize * start.j)) + pf.OneSquareSize / 2, (pf.UpperLeft.Y + (pf.OneSquareSize * start.i)) + pf.OneSquareSize / 2, format);
-
-            rect = new Rectangle(pf.UpperLeft.X + (pf.OneSquareSize * end.j), pf.UpperLeft.Y + (pf.OneSquareSize * end.i), pf.OneSquareSize, pf.OneSquareSize);
-            g.FillRectangle(Brushes.PapayaWhip, rect);
-            g.DrawRectangle(p, rect);
-            g.DrawString("E", f1, Brushes.Plum, (pf.UpperLeft.X + (pf.OneSquareSize * end.j)) + pf.OneSquareSize / 2, (pf.UpperLeft.Y + (pf.OneSquareSize * end.i)) + pf.OneSquareSize / 2, format);
-        }
-        void PfDrawListOfPoints(Graphics g, List<MyPoint> l, Brush b)
-        {
-            Rectangle rect;
-            foreach (MyPoint entry in l)
-            {
-                if (!entry.Equals(pf.Game.graph.start) && !entry.Equals(pf.Game.graph.end))
-                {
-                    rect = new Rectangle(pf.UpperLeft.X + (pf.OneSquareSize * entry.j), pf.UpperLeft.Y + (pf.OneSquareSize * entry.i), pf.OneSquareSize, pf.OneSquareSize);
-                    g.FillRectangle(b, rect);
-                    g.DrawRectangle(p, rect);
-                }
-            }
-        }
-        bool PfIsValidSquare(MouseEventArgs e, MyPoint square)
-        {
-            if (PfIsInsideGrid(e) && square.IsConnectedTo(pf.Game.userPath[^1]))
-            {
-                return true;
-            }
-            return false;
-        }
-        bool PfIsInsideGrid(MouseEventArgs e)
-        {
-            if (e.X > pf.UpperLeft.X && e.X < pf.UpperLeft.X + pf.DrawnGridSize && e.Y > pf.UpperLeft.Y && e.Y < pf.UpperLeft.Y + pf.DrawnGridSize)
-            {
-                return true;
-            }
-            return false;
-        }
-        void PfReset(int n)
-        {
-            pf.AddSquare = false;
-            pf.WallsHidden = false;
-            pf.DrawHitWalls = false;
-
-            pf.Game.userPath.Clear();
-            pf.Game.wallsHit.Clear();
-
-            pf.NumOfPuzzlesPlayed = n;
         }
         #endregion
 
-        #region Sum Up View
-        void SumUpOneRound(Graphics g)
-        {
-            su.Game = new SumUp(random.Next(15, 35));
-            SuDrawNumber(g);
-            SuDrawSum(g);
-        }
+        #region Sum Up
         void SuOnMouseDown(MouseEventArgs e)
         {
-            if (SuIsValidSquare(e))
+            if (sumUp.IsValidSquare(e))
             {
-                su.UserSum += su.Game.sum[su.Clicked.X, su.Clicked.Y];
-                su.AllClicked.Add(su.Clicked);
-                if (su.UserSum == su.Game.number)
+                sumUp.UserSum += sumUp.Game.sum[sumUp.Clicked.X, sumUp.Clicked.Y];
+                sumUp.AllClicked.Add(sumUp.Clicked);
+                if (sumUp.UserSum == sumUp.Game.number)
                 {
                     SumUpView.CorrectAnswers += 1;
-                    SuReset(SumUpView.CorrectAnswers);
+                    sumUp.Reset(SumUpView.CorrectAnswers);
                 }
-                else if (su.UserSum > su.Game.number)
+                else if (sumUp.UserSum > sumUp.Game.number)
                 {
-                    SuReset(0);
+                    sumUp.Reset(0);
                 }
                 Invalidate();
             }
         }
-        void SuOnPaint(Graphics g)
-        {
-            int t = 60 - su.Seconds;
-            g.DrawString($"Time left: {t}", f1, Brushes.Red, su.NumUpperLeft.X + 600, su.NumUpperLeft.Y - 50, format);
-            if (su.initialized && su.UserSum < su.Game.number)
-            {
-                SuDrawNumber(g);
-                SuDrawSum(g);
-            }
-            else if (!su.initialized)
-            {
-                su.initialized = true;
-                SumUpOneRound(g);
-            }
-        }
+
         void OnSuTimerEvent(object sender, EventArgs e)
         {
-            if(su.Seconds++ >= su.Duration)
+            if (sumUp.Seconds++ >= sumUp.Duration)
             {
-                su.Game.EvalScore();
+                sumUp.Game.EvalScore();
                 current = Const.Score;
-                su.Timer.Stop();
-                su.Seconds = 0;
-                SuReset(0);
+                sumUp.Timer.Stop();
+                sumUp.Seconds = 0;
+                sumUp.Reset(0);
             }
             Invalidate();
-        }
-        Point SuSumUpperLeftInitialValue()
-        {
-            return new Point
-            (
-                Center.X - (su.SquareSize * 4 + su.Margin * 3)/2,
-                su.NumUpperLeft.Y + su.SquareSize + 100
-            );
-        }
-        void SuDrawNumber(Graphics g)
-        {
-            su.NumUpperLeft = new Point
-           (
-               Center.X - su.SquareSize / 2,
-               Center.Y - Const.WindowHeight / 4 - su.SquareSize / 2 - 50 // quater of the screen and -50 to make it look nicer
-           );
-            g.DrawString(su.Game.number.ToString(), bigFont, Brushes.Navy, su.NumUpperLeft.X + su.SquareSize / 2, su.NumUpperLeft.Y + su.SquareSize / 2, format);
-        }
-        void SuDrawSum(Graphics g)
-        {
-            su.SumUpperLeft = SuSumUpperLeftInitialValue();
-            // colors at random
-            Brush[] brushes = new Brush[] { Brushes.CadetBlue, Brushes.Crimson, Brushes.SeaGreen, Brushes.DarkViolet };
-
-            // draw the sum in 4 rows and 3 columns
-            for (int i = 0; i < 4; i++)
-            {
-                for (int j = 0; j < 3; j++)
-                {
-                    if (su.AllClicked.Contains(new Point(i, j))) // shade already selected squares
-                    {
-                        SuDrawOneSquare(g, su.SumUpperLeft, su.Game.sum[i, j], Brushes.LightSteelBlue);
-
-                    }
-                    else
-                    {
-                        SuDrawOneSquare(g, su.SumUpperLeft, su.Game.sum[i, j], brushes[i]);
-                    }
-                    su.SumUpperLeft.Y += su.SquareSize + su.Margin;
-                }
-                su.SumUpperLeft.X += su.SquareSize + su.Margin;
-                su.SumUpperLeft.Y -= (su.SquareSize + su.Margin) * 3;
-            }
-            su.SumUpperLeft = SuSumUpperLeftInitialValue();
-        }
-        void SuDrawOneSquare(Graphics g, Point upperLeft, int i, Brush b)
-        {
-            Rectangle rect = new Rectangle(upperLeft.X, upperLeft.Y, su.SquareSize, su.SquareSize);
-            g.FillRectangle(b, rect);
-            g.DrawRectangle(p, rect);
-            g.DrawString(i.ToString(), f1, Brushes.Plum, upperLeft.X + su.SquareSize / 2, upperLeft.Y + su.SquareSize / 2, format);
-        }
-        bool SuIsValidSquare(MouseEventArgs e)
-        {
-            for (int i = 0; i < 4; i++)
-            {
-                for (int j = 0; j < 3; j++)
-                {
-                    su.Clicked = new Point(i, j);
-                    if (e.X > su.SumUpperLeft.X && e.X < su.SumUpperLeft.X + 120 && e.Y > su.SumUpperLeft.Y && e.Y < su.SumUpperLeft.Y + 120
-                        && !su.AllClicked.Contains(su.Clicked))
-                    {
-                        su.SumUpperLeft = SuSumUpperLeftInitialValue();
-                        return true;
-                    }
-                    su.SumUpperLeft.Y += 150;
-                }
-                su.SumUpperLeft.X += 150;
-                su.SumUpperLeft.Y -= 150 * 3;
-            }
-            su.SumUpperLeft = SuSumUpperLeftInitialValue();
-            return false;
-        }
-        void SuReset(int n)
-        {
-            su.UserSum = 0;
-            SumUpView.CorrectAnswers = n;
-            su.initialized = false;
-            su.AllClicked.Clear();
         }
         #endregion
     }

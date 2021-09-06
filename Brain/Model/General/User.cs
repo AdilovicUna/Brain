@@ -3,7 +3,7 @@ using System.IO;
 
 namespace Brain.Model
 {
-    class User
+    public class User
     {
         public string Name { get; set; }
         public string UserFilePath { get; set; }
