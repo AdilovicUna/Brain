@@ -17,7 +17,8 @@ namespace Brain
         public Point NumUpperLeft;
         public Point SumUpperLeft;
         public Point Clicked;
-        
+        public bool initialized = false;
+
 
         public void OneRound(Graphics g)
         {
@@ -29,14 +30,14 @@ namespace Brain
         public void OnPaint(Graphics g)
         {
             Form1.timer.DrawTimer(g);
-            if (Form1.timer.initialized && UserSum < Game.number)
+            if (initialized && UserSum < Game.number)
             {
                 DrawNumber(g);
                 DrawSum(g);
             }
-            else if (!Form1.timer.initialized)
+            else if (!initialized)
             {
-                Form1.timer.initialized = true;
+                initialized = true;
                 OneRound(g);
             }
         }
@@ -98,7 +99,7 @@ namespace Brain
                 for (int j = 0; j < 3; j++)
                 {
                     Clicked = new Point(i, j);
-                    if (e.X > SumUpperLeft.X && e.X < SumUpperLeft.X + 120 && e.Y > SumUpperLeft.Y && e.Y < SumUpperLeft.Y + 120
+                    if (e.X > SumUpperLeft.X && e.X < SumUpperLeft.X + SquareSize && e.Y > SumUpperLeft.Y && e.Y < SumUpperLeft.Y + SquareSize
                         && !AllClicked.Contains(Clicked))
                     {
                         SumUpperLeft = SumUpperLeftInitialValue();
@@ -116,7 +117,7 @@ namespace Brain
         {
             UserSum = 0;
             CorrectAnswers = n;
-            Form1.timer.initialized = false;
+            initialized = false;
             AllClicked.Clear();
         }
     }

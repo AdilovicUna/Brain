@@ -66,8 +66,17 @@ namespace Brain.Model
 
         public RomanNumeral()
         {
+            Generate();
+            while(Value.Length >= 8)
+            {
+                Value = "";
+                Generate();
+            }
+        }
+        private void Generate()
+        {
             numValue = random.Next(1, 3999);
-            for (int i = 0; i < 13; i++)
+            for (int i = 0; i < roman.Length; i++)
             {
                 while (numValue >= decimals[i])
                 {
@@ -76,22 +85,22 @@ namespace Brain.Model
                 }
             }
         }
+        public int CompareTo(RomanNumeral other)
+        {
+            if (other == null) return 1;
+            return numValue.CompareTo(other.numValue);
+        }
         public override bool Equals(object obj)
         {
             if (obj == null || !(obj is RomanNumeral))
             {
                 return false;
             }
-            return (numValue == ((RomanNumeral)obj).numValue);
+            return (Value == ((RomanNumeral)obj).Value);
         }
         public override int GetHashCode()
         {
-            return numValue.GetHashCode() ^ numValue.GetHashCode();
-        }
-        public int CompareTo(RomanNumeral other)
-        {
-            if (other == null) return 1;
-            return numValue.CompareTo(other.numValue);
+            return Value.GetHashCode() ^ Value.GetHashCode();
         }
         public override string ToString() => Value;
     }

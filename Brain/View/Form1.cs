@@ -38,7 +38,7 @@ namespace Brain
             Controls.Add(Play);
 
             // Timers
-            timer.Timer.Tick += new EventHandler(OnSuTimerEvent);
+            timer.Timer.Tick += new EventHandler(OnTimerEvent);
         }
 
         #region Buttons
@@ -162,7 +162,7 @@ namespace Brain
             RemoveOnPlayClickButtons();
             current = Const.SumUp;
             timer.Timer.Start();
-            Invalidate();
+            //Invalidate();
         }
         public void OnLowToHighClick(object sender, EventArgs args)
         {
@@ -233,6 +233,10 @@ namespace Brain
             {
                 SuOnMouseDown(e);
             }
+            else if (current == Const.LowToHigh)
+            {
+                LthOnMouseDown(e);
+            }
             else
             {
                 CheckIfUsernameBoxClicked(e);
@@ -297,6 +301,39 @@ namespace Brain
         }
 
 
+        #endregion
+
+        #region Timer
+        void OnTimerEvent(object sender, EventArgs e)
+        {
+            if (timer.Seconds++ >= MyTimer.Duration)
+            {
+                /*if (current == Const.SumUp)
+                {
+                    sumUp.Game.EvalScore();
+                }
+                else if (current == Const.LowToHigh)
+                {
+                    switch (lowToHigh.type)
+                    {
+                        case "Dots":
+                            lowToHigh.Dots.EvalScore();
+                            break;
+                        case "Number":
+                            lowToHigh.Number.EvalScore();
+                            break;
+                        case "Roman Numeral":
+                            lowToHigh.RomanNumeral.EvalScore();
+                            break;
+                    }
+                }*/
+                current = Const.Score;
+                timer.Timer.Stop();
+                timer.Seconds = 0;
+                sumUp.Reset(0);
+            }
+            Invalidate();
+        }
         #endregion
 
         #region Statistics
@@ -372,18 +409,24 @@ namespace Brain
             }
         }
 
-        void OnSuTimerEvent(object sender, EventArgs e)
+
+        #endregion
+
+        #region Low to High
+        void LthOnMouseDown(MouseEventArgs e)
         {
-            if (timer.Seconds++ >= MyTimer.Duration)
+            if (lowToHigh.IsValidSquare(e))
             {
-                sumUp.Game.EvalScore();
-                current = Const.Score;
-                timer.Timer.Stop();
-                timer.Seconds = 0;
-                sumUp.Reset(0);
+                lowToHigh.clicked = true;
+                if(lowToHigh.curClicked != lowToHigh.prevClicked + 1 || lowToHigh.curClicked == 0)
+                {
+                    lowToHigh.correct = false;
+                }
+                lowToHigh.correct = true;
             }
             Invalidate();
         }
         #endregion
+
     }
 }

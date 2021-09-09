@@ -61,6 +61,7 @@ namespace Brain
 
         public static MyTimer timer = new MyTimer();
 
+
         int current = Const.FirstWindow;
         bool newUser = false;
 
