@@ -9,7 +9,7 @@ namespace ViewConstants
         public const int MainMenu = 0;
         public const int PathFinding = 1;
         public const int SumUp = 2;
-        public const int ColorRead = 3;
+        public const int LowToHigh = 3;
         public const int PartialMatch = 4;
         public const int Score = 5;
         public const int Statistics = 6;

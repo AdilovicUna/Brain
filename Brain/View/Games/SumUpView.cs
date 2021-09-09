@@ -17,10 +17,7 @@ namespace Brain
         public Point NumUpperLeft;
         public Point SumUpperLeft;
         public Point Clicked;
-        public Timer Timer = new Timer { Interval = 1000 };
-        public int Seconds = 0;
-        public int Duration = 60;
-        public bool initialized = false;
+        
 
         public void OneRound(Graphics g)
         {
@@ -31,16 +28,15 @@ namespace Brain
 
         public void OnPaint(Graphics g)
         {
-            int t = 60 - Seconds;
-            g.DrawString($"Time left: {t}", Form1.f1, Brushes.Red, NumUpperLeft.X + 600, NumUpperLeft.Y - 50, Form1.format);
-            if (initialized && UserSum < Game.number)
+            Form1.timer.DrawTimer(g);
+            if (Form1.timer.initialized && UserSum < Game.number)
             {
                 DrawNumber(g);
                 DrawSum(g);
             }
-            else if (!initialized)
+            else if (!Form1.timer.initialized)
             {
-                initialized = true;
+                Form1.timer.initialized = true;
                 OneRound(g);
             }
         }
@@ -120,7 +116,7 @@ namespace Brain
         {
             UserSum = 0;
             CorrectAnswers = n;
-            initialized = false;
+            Form1.timer.initialized = false;
             AllClicked.Clear();
         }
     }

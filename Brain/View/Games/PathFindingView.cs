@@ -7,7 +7,7 @@ namespace Brain
 {
     public class PathFindingView
     {
-        public Game1 Game = new Game1(6);
+        public PathFinding Game = new PathFinding(6);
         public readonly int OneSquareSize = 70;
         public readonly int MaxPuzzles = 10;
 
@@ -31,11 +31,11 @@ namespace Brain
             // first half of one sesion will be easier (smaller puzzles), and second half will be harder
             if (NumOfPuzzlesPlayed <= MaxPuzzles / 2)
             {
-                Game = new Game1(Form1.random.Next(5, 8));
+                Game = new PathFinding(Form1.random.Next(5, 8));
             }
             else
             {
-               Game = new Game1(Form1.random.Next(7, 10));
+               Game = new PathFinding(Form1.random.Next(7, 10));
             }
             Game.userPath.Add(Game.graph.start);
 

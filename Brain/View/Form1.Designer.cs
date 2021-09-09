@@ -59,6 +59,8 @@ namespace Brain
             Y = Const.WindowHeight / 2
         };
 
+        public static MyTimer timer = new MyTimer();
+
         int current = Const.FirstWindow;
         bool newUser = false;
 

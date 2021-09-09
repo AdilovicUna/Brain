@@ -3,13 +3,13 @@ using System.Collections.Generic;
 
 namespace Brain.Model
 {
-    public class Game1 : Games
+    public class PathFinding : Games
     {
         public Graph graph;
         public List<MyPoint> userPath = new List<MyPoint>();
         public List<MyPoint> wallsHit = new List<MyPoint>(); 
 
-        public Game1(int size)
+        public PathFinding(int size)
         {
             Random random = new Random();
 

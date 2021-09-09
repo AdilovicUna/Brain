@@ -11,6 +11,7 @@ namespace Brain
     {
         readonly PathFindingView pathFinding = new PathFindingView();
         readonly SumUpView sumUp = new SumUpView();
+        readonly LowToHighView lowToHigh = new LowToHighView();
         public Form1()
         {
             InitializeComponent();
@@ -37,7 +38,7 @@ namespace Brain
             Controls.Add(Play);
 
             // Timers
-            sumUp.Timer.Tick += new EventHandler(OnSuTimerEvent);
+            timer.Timer.Tick += new EventHandler(OnSuTimerEvent);
         }
 
         #region Buttons
@@ -60,6 +61,7 @@ namespace Brain
         public void ExitButton()
         {
             current = Const.MainMenu;
+            user.StoreData(Games.score);
             Point ExitPos = new Point(600, 650);
             Exit = CreateButton("Exit", ExitPos, Const.ExitWidth, Const.ExitHeight, Color.LavenderBlush, Color.LightGreen, f1);
             Exit.Click += new EventHandler(MainMenu);
@@ -137,8 +139,8 @@ namespace Brain
             SumUp.Click += new EventHandler(OnSumUpClick);
             Controls.Add(SumUp);
             //create Color read button
-            ColorRead = CreateButton("Color Read", Game3Pos, Const.GameSquareWidth, Const.GameSquareHeight, forecolor, backcolor, f1);
-            ColorRead.Click += new EventHandler(MainMenu);
+            ColorRead = CreateButton("Low To High", Game3Pos, Const.GameSquareWidth, Const.GameSquareHeight, forecolor, backcolor, f1);
+            ColorRead.Click += new EventHandler(OnLowToHighClick);
             Controls.Add(ColorRead);
             //create Partial match button
             PartialMatch = CreateButton("Partial Match", Game4Pos, Const.GameSquareWidth, Const.GameSquareHeight, forecolor, backcolor, f1);
@@ -149,15 +151,25 @@ namespace Brain
         }
         public void OnPathFindingClick(object sender, EventArgs args)
         {
+            user.GameName = "Path Finding";
             RemoveOnPlayClickButtons();
             current = Const.PathFinding;
             Invalidate();
         }
         public void OnSumUpClick(object sender, EventArgs args)
         {
+            user.GameName = "Sum Up";
             RemoveOnPlayClickButtons();
             current = Const.SumUp;
-            sumUp.Timer.Start();
+            timer.Timer.Start();
+            Invalidate();
+        }
+        public void OnLowToHighClick(object sender, EventArgs args)
+        {
+            user.GameName = "Low To High";
+            RemoveOnPlayClickButtons();
+            current = Const.LowToHigh;
+            timer.Timer.Start();
             Invalidate();
         }
         public void OnStatisticsClick(object sender, EventArgs args)
@@ -205,6 +217,10 @@ namespace Brain
             else if (current == Const.SumUp)
             {
                 sumUp.OnPaint(g);
+            }
+            else if (current == Const.LowToHigh)
+            {
+                lowToHigh.OnPaint(g);
             }
         }
         protected override void OnMouseDown(MouseEventArgs e)
@@ -327,7 +343,6 @@ namespace Brain
                     }
                     else // if they were, show the score, reset and exit
                     {
-                        user.StoreData("Path Finding", Games.score);
                         current = Const.Score;
                         pathFinding.Reset(0);
                     }
@@ -359,12 +374,12 @@ namespace Brain
 
         void OnSuTimerEvent(object sender, EventArgs e)
         {
-            if (sumUp.Seconds++ >= sumUp.Duration)
+            if (timer.Seconds++ >= MyTimer.Duration)
             {
                 sumUp.Game.EvalScore();
                 current = Const.Score;
-                sumUp.Timer.Stop();
-                sumUp.Seconds = 0;
+                timer.Timer.Stop();
+                timer.Seconds = 0;
                 sumUp.Reset(0);
             }
             Invalidate();

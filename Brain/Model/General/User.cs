@@ -6,13 +6,14 @@ namespace Brain.Model
     public class User
     {
         public string Name { get; set; }
+        public string GameName { get; set; }
         public string UserFilePath { get; set; }
 
         public Dictionary<string, List<int>> data;
-        public void StoreData(string name, int score)
+        public void StoreData(int score)
         {
             using StreamWriter sw = File.AppendText(UserFilePath);
-            sw.WriteLine(name + " " + score);
+            sw.WriteLine(GameName + " " + score);
         }
         public void GetData()
         {
