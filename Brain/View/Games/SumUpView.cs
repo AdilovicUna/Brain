@@ -10,6 +10,7 @@ namespace Brain
     {
         public SumUp Game = new SumUp(1);
         public readonly int SquareSize = 120;
+        readonly Brush[] brushes = new Brush[] { Brushes.CadetBlue, Brushes.Crimson, Brushes.SeaGreen, Brushes.DarkViolet };
         public readonly int Margin = 30;
         public readonly List<Point> AllClicked = new List<Point>();
         public static int CorrectAnswers = 0;
@@ -61,8 +62,6 @@ namespace Brain
         public void DrawSum(Graphics g)
         {
             SumUpperLeft = SumUpperLeftInitialValue();
-            // colors at random
-            Brush[] brushes = new Brush[] { Brushes.CadetBlue, Brushes.Crimson, Brushes.SeaGreen, Brushes.DarkViolet };
 
             // draw the sum in 4 rows and 3 columns
             for (int i = 0; i < 4; i++)
