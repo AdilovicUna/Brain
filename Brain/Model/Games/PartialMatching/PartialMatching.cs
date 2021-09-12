@@ -1,8 +1,8 @@
 ﻿using System.Drawing;
 
 namespace Brain.Model
-{ 
-    class PartialMatching : Games
+{
+    public class PartialMatching : Games
     {
         public (string shape, Brush brush) cur;
         public (string shape, Brush brush) prev;

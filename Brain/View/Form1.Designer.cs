@@ -66,6 +66,11 @@ namespace Brain
         bool newUser = false;
 
         public readonly User user = new User();
+        public readonly Statistics statistics = new Statistics();
+        public readonly PathFindingView pathFinding = new PathFindingView();
+        public readonly SumUpView sumUp = new SumUpView();
+        public readonly LowToHighView lowToHigh = new LowToHighView();
+        public readonly PartialMatchingView partialMatching = new PartialMatchingView();
         #endregion
 
         #region UsernameBox global variables

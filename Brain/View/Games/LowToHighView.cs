@@ -6,7 +6,7 @@ using ViewConstants;
 
 namespace Brain
 {
-    class LowToHighView
+    public class LowToHighView
     {
         public LowToHigh<Dots> Dots;
         public LowToHigh<Number> Number;
@@ -19,6 +19,7 @@ namespace Brain
         public string type;
 
         public static int CorrectAnswers = 0;
+        public static int WrongAnswers = 0;
 
         private List<Point> positions = new List<Point>();
         public int curClicked = -1;
@@ -29,7 +30,7 @@ namespace Brain
         public bool clicked = false;
         private bool initialized = false;
 
-        private List<int> shade = new List<int>();
+        private readonly List<int> shade = new List<int>();
 
 
         public void OneRound(Graphics g)
@@ -159,12 +160,13 @@ namespace Brain
                 if (curClicked == positions.Count - 1)
                 {
                     CorrectAnswers += 1;
-                    Reset(CorrectAnswers);
+                    Reset(CorrectAnswers, WrongAnswers);
                     OneRound(g);
                 }
                 else if (!correct)
                 {
-                    Reset(CorrectAnswers);
+                    WrongAnswers += 1;
+                    Reset(CorrectAnswers, WrongAnswers);
                     OneRound(g);
                 }
                 else if (correct)
@@ -179,12 +181,13 @@ namespace Brain
 
         }
 
-        public void Reset(int n)
+        public void Reset(int c, int w)
         {
             values.Clear();
             positions.Clear();
             shade.Clear();
-            CorrectAnswers = n;
+            CorrectAnswers = c;
+            WrongAnswers = w;
             prevClicked = -1;
             curClicked = -1;
         }

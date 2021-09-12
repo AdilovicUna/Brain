@@ -9,11 +9,11 @@ namespace Brain.Model
         public string GameName { get; set; }
         public string UserFilePath { get; set; }
 
-        public Dictionary<string, List<int>> data;
+        public Dictionary<string, List<int>> data = new Dictionary<string, List<int>>();
         public void StoreData(int score)
         {
             using StreamWriter sw = File.AppendText(UserFilePath);
-            sw.WriteLine(GameName + ": " + score);
+            sw.WriteLine(GameName + ":" + score);
         }
         public void GetData()
         {
@@ -22,7 +22,7 @@ namespace Brain.Model
             string[] splitLine;
             while ((line = sr.ReadLine()) != null)
             {
-                splitLine = line.Split();
+                splitLine = line.Split(':');
                 if (!data.ContainsKey(splitLine[0]))
                 {
                     data.Add(splitLine[0], new List<int>());

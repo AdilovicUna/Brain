@@ -8,7 +8,7 @@ using Brain.Model;
 
 namespace Brain
 {
-    class PartialMatchingView
+    public class PartialMatchingView
     {
         public PartialMatching Game = new PartialMatching();
         static readonly int BackgroundSquareSize = 250;
@@ -80,7 +80,7 @@ namespace Brain
         public void DrawNumberOfAnswers(Graphics g)
         {
 
-            rect = new Rectangle(UpperLeft.X + BackgroundSquareSize + SquareSize + 35,UpperLeft.Y + BackgroundSquareSize / 2 - 50 - SquareSize/4, SquareSize * 2, SquareSize / 2);
+            rect = new Rectangle(UpperLeft.X + BackgroundSquareSize + SquareSize + 25,UpperLeft.Y + BackgroundSquareSize / 2 - 50 - SquareSize/4, SquareSize * 2, SquareSize / 2);
             g.DrawRectangle(greenPen, rect);
             g.DrawString("Correct: " + CorrectAnswers.ToString(), 
                 Form1.f1, Brushes.MediumOrchid,
@@ -88,7 +88,7 @@ namespace Brain
                 UpperLeft.Y + BackgroundSquareSize / 2 - 50,
                 Form1.format);
 
-            rect = new Rectangle(UpperLeft.X + BackgroundSquareSize + SquareSize + 35, UpperLeft.Y + BackgroundSquareSize / 2 + 50 - SquareSize/4, SquareSize * 2, SquareSize / 2);
+            rect = new Rectangle(UpperLeft.X + BackgroundSquareSize + SquareSize + 25, UpperLeft.Y + BackgroundSquareSize / 2 + 50 - SquareSize/4, SquareSize * 2, SquareSize / 2);
             g.DrawRectangle(redPen, rect);
             g.DrawString("Wrong: " + WrongAnswers.ToString(), Form1.f1, Brushes.MediumOrchid,
                 UpperLeft.X + BackgroundSquareSize + SquareSize * 2,

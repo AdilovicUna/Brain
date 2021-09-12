@@ -2,7 +2,7 @@
 
 namespace Brain.Model
 {
-    class Dots : IComparable<Dots>
+    public class Dots : IComparable<Dots>
     {
         private readonly Random random = new Random();
         public readonly int Value;
@@ -29,7 +29,7 @@ namespace Brain.Model
             return Value.GetHashCode() ^ Value.GetHashCode();
         }
     }
-    class Number : IComparable<Number>
+    public class Number : IComparable<Number>
     {
         private readonly Random random = new Random();
         public readonly int Value;
@@ -56,7 +56,7 @@ namespace Brain.Model
             return Value.GetHashCode() ^ Value.GetHashCode();
         }
     }
-    class RomanNumeral : IComparable<RomanNumeral>
+    public class RomanNumeral : IComparable<RomanNumeral>
     {
         private readonly string[] roman = new string[] { "M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I" };
         private readonly int[] decimals = new int[] { 1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1 };

@@ -9,10 +9,6 @@ namespace Brain
 {
     public partial class Form1 : Form
     {
-        readonly PathFindingView pathFinding = new PathFindingView();
-        readonly SumUpView sumUp = new SumUpView();
-        readonly LowToHighView lowToHigh = new LowToHighView();
-        readonly PartialMatchingView partialMatching = new PartialMatchingView();
         public Form1()
         {
             InitializeComponent();
@@ -211,13 +207,13 @@ namespace Brain
             }
             else if (current == Const.Statistics)
             {
-                DrawStatistics(g);
+                statistics.DrawStatistics(g, user);
             }
             else if (current == Const.Score)
             {
                 pathFinding.Reset(0);
                 sumUp.Reset(0);
-                lowToHigh.Reset(0);
+                lowToHigh.Reset(0,0);
                 partialMatching.Reset();
 
                 DrawScore(g);
@@ -358,13 +354,6 @@ namespace Brain
 
             }
             Invalidate();
-        }
-        #endregion
-
-        #region Statistics
-        void DrawStatistics(Graphics g)
-        {
-            ExitButton();
         }
         #endregion
 

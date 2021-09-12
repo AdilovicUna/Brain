@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Brain.Model
 {
-    class LowToHigh<T> : Games where T: new()
+    public class LowToHigh<T> : Games where T: new()
     {
         public List<T> values;
         private readonly Random random = new Random();
@@ -24,7 +24,11 @@ namespace Brain.Model
 
         public override void EvalScore() 
         {
-            score = LowToHighView.CorrectAnswers * 100;
+            score = LowToHighView.CorrectAnswers * 100 - LowToHighView.WrongAnswers * 20;
+            if (score < 0)
+            {
+                score = 0;
+            }
         }
     }
 }
