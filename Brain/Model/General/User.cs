@@ -13,7 +13,7 @@ namespace Brain.Model
         public void StoreData(int score)
         {
             using StreamWriter sw = File.AppendText(UserFilePath);
-            sw.WriteLine(GameName + " " + score);
+            sw.WriteLine(GameName + ": " + score);
         }
         public void GetData()
         {

@@ -66,9 +66,10 @@ namespace Brain.Model
         }
 
         public override void EvalScore(){
+            score = 0;
             if (wallsHit.Count == 0)
             {
-                score += graph.gridSize* 100;
+                score += graph.gridSize * 100;
             }
             score += (userPath.Count - wallsHit.Count) * 25;
         }

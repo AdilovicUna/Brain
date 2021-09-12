@@ -17,7 +17,7 @@ namespace Brain
 
         public void DrawTimer(Graphics g)
         {
-            int t = 60 - Seconds;
+            int t = Duration - Seconds;
             g.DrawString($"Time left: {t}", Form1.f1, Brushes.Red, position.X, position.Y,  Form1.format);
         }
     }

@@ -12,7 +12,7 @@ namespace Brain
         public LowToHigh<Number> Number;
         public LowToHigh<RomanNumeral> RomanNumeral;
 
-        public List<string> values = new List<string>();
+        private List<string> values = new List<string>();
 
         public readonly int SquareSize = 150;
         readonly string[] types = new string[]{"Dots", "Number", "Roman Numeral" };
@@ -20,14 +20,17 @@ namespace Brain
 
         public static int CorrectAnswers = 0;
 
-        public List<Point> positions = new List<Point>();
+        private List<Point> positions = new List<Point>();
         public int curClicked = -1;
         public int prevClicked = -1;
-        public Point upperLeft;
+        private Point upperLeft;
 
         public bool correct = false;
         public bool clicked = false;
-        public bool initialized = false;
+        private bool initialized = false;
+
+        private List<int> shade = new List<int>();
+
 
         public void OneRound(Graphics g)
         {
@@ -54,30 +57,39 @@ namespace Brain
                     {
                         values.Add(entry.ToString());
                     }
-
                     break;
             }
             DrawAll(g);
         }
         void DrawAll(Graphics g)
         {
-            foreach (string entry in values)
+            for (int i = 0; i < values.Count; i++)
             {
-               /* if(positions.Count == values.Count)
+                if (positions.Count == values.Count)
                 {
-                    DrawOneField(g, entry, Brushes.MintCream);
+                    DrawOneField(g, values[i], PickBrush(i), positions[i]);
                 }
                 else
-                {*/
+                {
                     GenerateNewUpperLeft();
                     while (InsidePreviouslyDrawn())
                     {
                         GenerateNewUpperLeft();
                     }
                     positions.Add(new Point(upperLeft.X,upperLeft.Y));
-                    DrawOneField(g, entry, Brushes.MintCream,upperLeft);
-                //}
+                    DrawOneField(g, values[i], PickBrush(i), upperLeft);
+                }
+  
             }
+        }
+
+        Brush PickBrush(int i)
+        {
+            if(shade.Contains(i))
+            {
+                return Brushes.LightSteelBlue;
+            }
+            return Brushes.MintCream;
         }
         void DrawOneField(Graphics g, string s, Brush b, Point p)
         {
@@ -104,6 +116,7 @@ namespace Brain
                 {
                     prevClicked = curClicked;
                     curClicked = i;
+                    shade.Add(i);
                     return true;
                 }
             }
@@ -135,53 +148,45 @@ namespace Brain
         public void OnPaint(Graphics g)
         {
             Form1.timer.DrawTimer(g);
-            
-            if (clicked)
+            if (!initialized)
             {
-                MessageBox.Show(curClicked.ToString());
+                OneRound(g);
+                initialized = true;
+            }
+            else if (clicked)
+            {
                 clicked = false;
                 if (curClicked == positions.Count - 1)
                 {
                     CorrectAnswers += 1;
-                    Reset();
-                    Program.WaitSec(1);
+                    Reset(CorrectAnswers);
                     OneRound(g);
                 }
                 else if (!correct)
                 {
-                    DrawAll(g);
-                    DrawOneField(g, values[curClicked], Brushes.Silver,upperLeft);
-                    Program.WaitSec(1);
+                    Reset(CorrectAnswers);
                     OneRound(g);
                 }
                 else if (correct)
                 {
-                    //positions.RemoveAt(curClicked);
                     DrawAll(g);
                 }
             }
-            else if (!initialized)
-            {
-                initialized = true;
-                MessageBox.Show("2");
-                OneRound(g);
-                MessageBox.Show("3");
-            }
-            else if(!clicked)
+            else
             {
                 DrawAll(g);
             }
 
         }
 
-        public void Reset()
+        public void Reset(int n)
         {
             values.Clear();
             positions.Clear();
-            CorrectAnswers = 0;
-            prevClicked = 0;
-            curClicked = 0;
-            initialized = false;
+            shade.Clear();
+            CorrectAnswers = n;
+            prevClicked = -1;
+            curClicked = -1;
         }
     }
 }

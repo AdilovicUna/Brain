@@ -22,6 +22,9 @@ namespace Brain.Model
             values.Sort();
         }
 
-        public override void EvalScore() { }
+        public override void EvalScore() 
+        {
+            score = LowToHighView.CorrectAnswers * 100;
+        }
     }
 }
