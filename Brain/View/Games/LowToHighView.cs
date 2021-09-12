@@ -113,7 +113,8 @@ namespace Brain
             for(int i = 0; i < positions.Count; i++)
             {
                 if (e.X > positions[i].X && e.X < positions[i].X + SquareSize &&
-                    e.Y > positions[i].Y && e.Y < positions[i].Y + SquareSize)
+                    e.Y > positions[i].Y && e.Y < positions[i].Y + SquareSize
+                    && !shade.Contains(i))
                 {
                     prevClicked = curClicked;
                     curClicked = i;

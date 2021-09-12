@@ -24,6 +24,8 @@
         }
         public bool IsConnectedTo(MyPoint p)
         {
+            // check if 2 points are next to each other on the grid
+            // diagonals not included
             if (Equals(new MyPoint(p.i - 1, p.j)) || Equals(new MyPoint(p.i + 1, p.j)) ||
                 Equals(new MyPoint(p.i, p.j - 1)) || Equals(new MyPoint(p.i, p.j + 1)))
             {

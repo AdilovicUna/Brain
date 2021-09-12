@@ -5,8 +5,8 @@ namespace Brain.Model
 {
     public static class Extension
     {
-        public static List<int> Split(this int n)
-        {
+        public static List<int> Split(this int n) // splits a number into addends 
+        {   
             Random random = new Random();
             List<int> result = new List<int>();
             int totalLeft = n;
@@ -26,7 +26,7 @@ namespace Brain.Model
                 }
             }
         }
-        public static T[,] ListTo2DArray<T>(this List<T> l, int rows, int columns)
+        public static T[,] ListTo2DArray<T>(this List<T> l, int rows, int columns) // converts a 2D list of type T into an array
         {
             T[,] result = new T[rows, columns];
             int index = 0;

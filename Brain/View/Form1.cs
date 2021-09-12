@@ -118,6 +118,12 @@ namespace Brain
             Point Game2Pos = new Point(450, 250);
             Point Game3Pos = new Point(800, 250);
             Point Game4Pos = new Point(1150, 250);
+
+            Point Game1HelpPos = new Point(Game1Pos.X + Const.GameSquareWidth - 50, Game1Pos.Y + Const.GameSquareHeight + 5);
+            Point Game2HelpPos = new Point(Game2Pos.X + Const.GameSquareWidth - 50, Game2Pos.Y + Const.GameSquareHeight + 5);
+            Point Game3HelpPos = new Point(Game3Pos.X + Const.GameSquareWidth - 50, Game3Pos.Y + Const.GameSquareHeight + 5);
+            Point Game4HelpPos = new Point(Game4Pos.X + Const.GameSquareWidth - 50, Game4Pos.Y + Const.GameSquareHeight + 5);
+
             Point StatisticsPos = new Point(600, 650);
 
             Color forecolor = Color.LavenderBlush;
@@ -127,22 +133,38 @@ namespace Brain
             Statistics = CreateButton("Statistics", StatisticsPos, Const.StatisticsWidth, Const.StatisticsHeight, WindowColor, Color.LavenderBlush, f1);
             Statistics.Click += new EventHandler(OnStatisticsClick);
             Controls.Add(Statistics);
-            //create Path finding button
+            //create Path Finding button
             PathFinding = CreateButton("Path Finding", Game1Pos, Const.GameSquareWidth, Const.GameSquareHeight, forecolor, backcolor, f1);
             PathFinding.Click += new EventHandler(OnPathFindingClick);
             Controls.Add(PathFinding);
-            //create Low to High button
+            //create Sum Up button
             SumUp = CreateButton("Sum up", Game2Pos, Const.GameSquareWidth, Const.GameSquareHeight, forecolor, backcolor, f1);
             SumUp.Click += new EventHandler(OnSumUpClick);
             Controls.Add(SumUp);
-            //create Color read button
-            ColorRead = CreateButton("Low To High", Game3Pos, Const.GameSquareWidth, Const.GameSquareHeight, forecolor, backcolor, f1);
-            ColorRead.Click += new EventHandler(OnLowToHighClick);
-            Controls.Add(ColorRead);
-            //create Partial match button
+            //create Low To High button
+            LowToHigh = CreateButton("Low To High", Game3Pos, Const.GameSquareWidth, Const.GameSquareHeight, forecolor, backcolor, f1);
+            LowToHigh.Click += new EventHandler(OnLowToHighClick);
+            Controls.Add(LowToHigh);
+            //create Partial Match button
             PartialMatch = CreateButton("Partial Matching", Game4Pos, Const.GameSquareWidth, Const.GameSquareHeight, forecolor, backcolor, f1);
             PartialMatch.Click += new EventHandler(OnPartialMatchingClick);
             Controls.Add(PartialMatch);
+            //create Path finding Help button
+            PathFindingHelp = CreateButton("?", Game1HelpPos, Const.HelpSquareSize, Const.HelpSquareSize, forecolor, backcolor, f1);
+            PathFindingHelp.Click += new EventHandler(OnPathFindingHelpClick);
+            Controls.Add(PathFindingHelp);
+            //create Sum Up Help button
+            SumUpHelp = CreateButton("?", Game2HelpPos, Const.HelpSquareSize, Const.HelpSquareSize, forecolor, backcolor, f1);
+            SumUpHelp.Click += new EventHandler(OnSumUpHelpClick);
+            Controls.Add(SumUpHelp);
+            //create Low to High Help button
+            LowToHighHelp = CreateButton("?", Game3HelpPos, Const.HelpSquareSize, Const.HelpSquareSize, forecolor, backcolor, f1);
+            LowToHighHelp.Click += new EventHandler(OnLowToHighHelpClick);
+            Controls.Add(LowToHighHelp);
+            //create Partial Match Help button
+            PartialMatchHelp = CreateButton("?", Game4HelpPos, Const.HelpSquareSize, Const.HelpSquareSize, forecolor, backcolor, f1);
+            PartialMatchHelp.Click += new EventHandler(OnPartialMatchingHelpClick);
+            Controls.Add(PartialMatchHelp);
 
             current = Const.MainMenu;
         }
@@ -159,7 +181,7 @@ namespace Brain
             RemoveOnPlayClickButtons();
             current = Const.SumUp;
             timer.Timer.Start();
-            //Invalidate();
+            Invalidate();
         }
         public void OnLowToHighClick(object sender, EventArgs args)
         {
@@ -183,13 +205,78 @@ namespace Brain
             current = Const.Statistics;
             Invalidate();
         }
+        public void OnPathFindingHelpClick(object sender, EventArgs args)
+        {
+            string text = @"This game has 10 rounds. 
+At first you will see a grid with red walls. 
+Try to memorize it. 
+Then, the walls dissapear and start and end points show up.
+Your job is to try to connect them by clicking on the fields of the grid.
+Avoid the walls!";
+            CreateHelp(text);
+        }
+        public void OnSumUpHelpClick(object sender, EventArgs args)
+        {
+            string text = @"Try to select the numbers in squares so that they add up to the one above the grid.
+The more correct answers you manage, the bigger your score will be!";
+            CreateHelp(text);
+        }
+        public void OnLowToHighHelpClick(object sender, EventArgs args)
+        {
+            string text = @"The title is pretty self explanatory, 
+click from lowest to highest values 
+and 
+get as many correct rounds as posible in one minute.";
+            CreateHelp(text);
+        }
+        public void OnPartialMatchingHelpClick(object sender, EventArgs args)
+        {
+            string text = @"For this game you need to use your keyboard.
+At the beginning you will see 2 shapes drawn one after the other.
+If they are completely the same, click right.
+If only shape or colors match, click down.
+In case they do not match at all, click left!";
+            CreateHelp(text);
+        }
+        public void CreateHelp(string text) 
+        {
+            Form help = new Form
+            {
+                Height = 500,
+                Width = 500,
+                Text = "Help"
+            };
+
+            Label explanations = new Label
+            {
+                Name = "Explanations",
+                Height = 350,
+                Width = 400,
+                Location = new Point(50, 15),
+                Font = new Font("Georgia", 13),
+                Text = text,
+                AutoSize = false,
+                TextAlign = ContentAlignment.MiddleCenter,
+
+            };
+            Button exit = CreateButton("OK", new Point(150, 375), 200, 50, Color.Black, Color.LightGreen, f2);
+            exit.Click += (sender, e) => { help.Close(); };
+
+            help.Controls.Add(explanations);
+            help.Controls.Add(exit);
+            help.ShowDialog();
+        }
         public void RemoveOnPlayClickButtons()
         {
             Controls.Remove(Statistics);
             Controls.Remove(PathFinding);
             Controls.Remove(SumUp);
-            Controls.Remove(ColorRead);
+            Controls.Remove(LowToHigh);
             Controls.Remove(PartialMatch);
+            Controls.Remove(PathFindingHelp);
+            Controls.Remove(SumUpHelp);
+            Controls.Remove(LowToHighHelp);
+            Controls.Remove(PartialMatchHelp);
         }
         #endregion
 
@@ -269,8 +356,8 @@ namespace Brain
             {
                 editBox = new TextBox
                 {
-                    Font = f1
-                };
+                    Font = new Font("Times New Roman", 50)
+            };
                 editBox.SetBounds(UsernameBoxPos.X, UsernameBoxPos.Y, Const.UsernameWidth, Const.UsernameHeight);
                 Controls.Add(editBox);
                 editBox.Focus();
@@ -358,9 +445,7 @@ namespace Brain
         #endregion
 
         // GAME REQUIREMENTS:
-        // Each game has to have 5 main things: model (in a separate file), controls for mouse down and onPaint, score eval function, general drawing and a reset function
-        // all functions and global variables related to the new game should start with an abbreviation for that game.
-        // eg. all Path finding related functions/vars start with Pf
+        // Each game has to have 5 main things: model (in a separate file), controls for mouse down (if needed) and onPaint, score eval function, general drawing and a reset function
 
         #region Path Finding View
         void PfOnMouseDown(MouseEventArgs e)
@@ -444,6 +529,7 @@ namespace Brain
         }
 
         #endregion
+
         #region Partial Matching
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {

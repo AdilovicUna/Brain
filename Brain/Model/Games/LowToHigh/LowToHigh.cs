@@ -14,7 +14,7 @@ namespace Brain.Model
             while(values.Count != length)
             {
                 T temp = new T();
-                if (!values.Contains(temp))
+                if (!values.Contains(temp)) // we can't have duplicates
                 {
                     values.Add(temp);
                 }

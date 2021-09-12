@@ -1,7 +1,7 @@
 ﻿using System;
 
 namespace Brain.Model
-{
+{   // every class in this file has an override of ToString, Eqala and GetHashCode methods and is an instance of IComparable<T>
     public class Dots : IComparable<Dots>
     {
         private readonly Random random = new Random();
@@ -61,13 +61,13 @@ namespace Brain.Model
         private readonly string[] roman = new string[] { "M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I" };
         private readonly int[] decimals = new int[] { 1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1 };
         private readonly Random random = new Random();
+        private int numValue;
         public string Value;
-        public int numValue;
 
         public RomanNumeral()
         {
             Generate();
-            while(Value.Length >= 8)
+            while(Value.Length >= 8) // to make it easier on the user
             {
                 Value = "";
                 Generate();
@@ -75,12 +75,13 @@ namespace Brain.Model
         }
         private void Generate()
         {
-            numValue = random.Next(1, 3999);
+            numValue = random.Next(1, 3999); // boundry for the highest roman numeral
+            int numValueCopy = numValue;
             for (int i = 0; i < roman.Length; i++)
             {
-                while (numValue >= decimals[i])
+                while (numValueCopy >= decimals[i])
                 {
-                    numValue -= decimals[i];
+                    numValueCopy -= decimals[i];
                     Value += roman[i];
                 }
             }

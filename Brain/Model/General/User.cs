@@ -15,7 +15,7 @@ namespace Brain.Model
             using StreamWriter sw = File.AppendText(UserFilePath);
             sw.WriteLine(GameName + ":" + score);
         }
-        public void GetData()
+        public void GetData() // splits the content of the user file into a dictionary, preserve the chronology
         {
             using StreamReader sr = new StreamReader(UserFilePath);
             string line;

@@ -32,9 +32,13 @@ namespace Brain
         Button Play;
         Button Statistics;
         Button PathFinding;
-        Button PartialMatch;
         Button SumUp;
-        Button ColorRead;
+        Button LowToHigh;
+        Button PartialMatch; 
+        Button PathFindingHelp;
+        Button SumUpHelp;
+        Button LowToHighHelp;
+        Button PartialMatchHelp;
         Button Exit;
         #endregion
 

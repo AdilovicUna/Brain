@@ -31,6 +31,8 @@ namespace ViewConstants
         public const int GameSquareWidth = 250;
         public const int GameSquareHeight = 200;
 
+        public const int HelpSquareSize = 50;
+
         public const int StatisticsWidth = 300;
         public const int StatisticsHeight = 150;
 
