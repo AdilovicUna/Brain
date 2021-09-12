@@ -63,6 +63,14 @@ namespace Brain
             Exit.Click += new EventHandler(MainMenu);
             Controls.Add(Exit);
         }
+        public void StatsExitButton()
+        {
+            current = Const.MainMenu;
+            Point ExitPos = new Point(Const.WindowWidth/2 - Const.StatsExitWidth/2,800);
+            Exit = CreateButton("Exit", ExitPos, Const.StatsExitWidth, Const.StatsExitHeight, Color.LavenderBlush, Color.LightGreen, f1);
+            Exit.Click += new EventHandler(MainMenu);
+            Controls.Add(Exit);
+        }
         public void OnNewUserClick(object sender, EventArgs args)
         {
             newUser = true;
@@ -295,6 +303,7 @@ In case they do not match at all, click left!";
             else if (current == Const.Statistics)
             {
                 statistics.DrawStatistics(g, user);
+                StatsExitButton();
             }
             else if (current == Const.Score)
             {
@@ -306,8 +315,6 @@ In case they do not match at all, click left!";
                 DrawScore(g);
                 ExitButton();
                 user.StoreData(Games.score);
-
-
             }
             else if (current == Const.PathFinding)
             {
