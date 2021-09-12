@@ -10,7 +10,7 @@ namespace ViewConstants
         public const int PathFinding = 1;
         public const int SumUp = 2;
         public const int LowToHigh = 3;
-        public const int PartialMatch = 4;
+        public const int PartialMatching = 4;
         public const int Score = 5;
         public const int Statistics = 6;
 

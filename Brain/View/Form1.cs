@@ -12,6 +12,7 @@ namespace Brain
         readonly PathFindingView pathFinding = new PathFindingView();
         readonly SumUpView sumUp = new SumUpView();
         readonly LowToHighView lowToHigh = new LowToHighView();
+        readonly PartialMatchingView partialMatching = new PartialMatchingView();
         public Form1()
         {
             InitializeComponent();
@@ -38,7 +39,7 @@ namespace Brain
             Controls.Add(Play);
 
             // Timers
-            timer.Timer.Tick += new EventHandler(OnSuTimerEvent);
+            timer.Timer.Tick += new EventHandler(OnTimerEvent);
         }
 
         #region Buttons
@@ -61,7 +62,6 @@ namespace Brain
         public void ExitButton()
         {
             current = Const.MainMenu;
-            user.StoreData(Games.score);
             Point ExitPos = new Point(600, 650);
             Exit = CreateButton("Exit", ExitPos, Const.ExitWidth, Const.ExitHeight, Color.LavenderBlush, Color.LightGreen, f1);
             Exit.Click += new EventHandler(MainMenu);
@@ -117,6 +117,7 @@ namespace Brain
             Controls.Remove(ExistingUser);
             Controls.Remove(Play);
 
+
             Point Game1Pos = new Point(100, 250);
             Point Game2Pos = new Point(450, 250);
             Point Game3Pos = new Point(800, 250);
@@ -143,8 +144,8 @@ namespace Brain
             ColorRead.Click += new EventHandler(OnLowToHighClick);
             Controls.Add(ColorRead);
             //create Partial match button
-            PartialMatch = CreateButton("Partial Match", Game4Pos, Const.GameSquareWidth, Const.GameSquareHeight, forecolor, backcolor, f1);
-            PartialMatch.Click += new EventHandler(MainMenu);
+            PartialMatch = CreateButton("Partial Matching", Game4Pos, Const.GameSquareWidth, Const.GameSquareHeight, forecolor, backcolor, f1);
+            PartialMatch.Click += new EventHandler(OnPartialMatchingClick);
             Controls.Add(PartialMatch);
 
             current = Const.MainMenu;
@@ -162,13 +163,21 @@ namespace Brain
             RemoveOnPlayClickButtons();
             current = Const.SumUp;
             timer.Timer.Start();
-            Invalidate();
+            //Invalidate();
         }
         public void OnLowToHighClick(object sender, EventArgs args)
         {
             user.GameName = "Low To High";
             RemoveOnPlayClickButtons();
             current = Const.LowToHigh;
+            timer.Timer.Start();
+            Invalidate();
+        }
+        public void OnPartialMatchingClick(object sender, EventArgs args)
+        {
+            user.GameName = "Matching";
+            RemoveOnPlayClickButtons();
+            current = Const.PartialMatching;
             timer.Timer.Start();
             Invalidate();
         }
@@ -206,9 +215,16 @@ namespace Brain
             }
             else if (current == Const.Score)
             {
+                pathFinding.Reset(0);
+                sumUp.Reset(0);
+                lowToHigh.Reset(0);
+                partialMatching.Reset();
+
                 DrawScore(g);
-                Games.score = 0;
                 ExitButton();
+                user.StoreData(Games.score);
+
+
             }
             else if (current == Const.PathFinding)
             {
@@ -222,6 +238,10 @@ namespace Brain
             {
                 lowToHigh.OnPaint(g);
             }
+            else if (current == Const.PartialMatching)
+            {
+                partialMatching.OnPaint(g);
+            }
         }
         protected override void OnMouseDown(MouseEventArgs e)
         {
@@ -233,11 +253,16 @@ namespace Brain
             {
                 SuOnMouseDown(e);
             }
+            else if (current == Const.LowToHigh)
+            {
+                LthOnMouseDown(e);
+            }
             else
             {
                 CheckIfUsernameBoxClicked(e);
             }
         }
+      
         #endregion
 
         #region Username TextBox
@@ -299,6 +324,43 @@ namespace Brain
 
         #endregion
 
+        #region Timer
+        void OnTimerEvent(object sender, EventArgs e)
+        {
+            if (timer.Seconds++ >= MyTimer.Duration)
+            {
+                if (current == Const.SumUp)
+                {
+                    sumUp.Game.EvalScore();
+                }
+                else if (current == Const.PartialMatching)
+                {
+                    partialMatching.Game.EvalScore();
+                }
+                else if (current == Const.LowToHigh)
+                {
+                    switch (lowToHigh.type)
+                    {
+                        case "Dots":
+                            lowToHigh.Dots.EvalScore();
+                            break;
+                        case "Number":
+                            lowToHigh.Number.EvalScore();
+                            break;
+                        case "Roman Numeral":
+                            lowToHigh.RomanNumeral.EvalScore();
+                            break;
+                    }
+                }
+                current = Const.Score;
+                timer.Timer.Stop();
+                timer.Seconds = 0;
+
+            }
+            Invalidate();
+        }
+        #endregion
+
         #region Statistics
         void DrawStatistics(Graphics g)
         {
@@ -344,7 +406,6 @@ namespace Brain
                     else // if they were, show the score, reset and exit
                     {
                         current = Const.Score;
-                        pathFinding.Reset(0);
                     }
                 }
                 Invalidate();
@@ -372,18 +433,51 @@ namespace Brain
             }
         }
 
-        void OnSuTimerEvent(object sender, EventArgs e)
+
+        #endregion
+
+        #region Low to High
+        void LthOnMouseDown(MouseEventArgs e)
         {
-            if (timer.Seconds++ >= MyTimer.Duration)
+            if (lowToHigh.IsValidSquare(e))
             {
-                sumUp.Game.EvalScore();
-                current = Const.Score;
-                timer.Timer.Stop();
-                timer.Seconds = 0;
-                sumUp.Reset(0);
+                lowToHigh.clicked = true;
+                if(lowToHigh.curClicked != lowToHigh.prevClicked + 1 || (lowToHigh.prevClicked == -1 && lowToHigh.curClicked != 0))
+                {
+                    lowToHigh.correct = false;
+                }
+                else
+                {
+                    lowToHigh.correct = true;
+                }
             }
             Invalidate();
         }
+
+        #endregion
+        #region Partial Matching
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            if (current == Const.PartialMatching && (keyData == Keys.Down || keyData == Keys.Left || keyData == Keys.Right))
+            {
+                // left == no, right == yes, down == partially
+                if ((keyData == Keys.Down && partialMatching.Game.PartiallyMatch()) ||
+                    (keyData == Keys.Left && partialMatching.Game.NoMatch()) ||
+                    (keyData == Keys.Right && partialMatching.Game.Match()))
+                {
+                    partialMatching.correct = true;
+                }
+                else
+                {
+                    partialMatching.correct = false;
+                }
+                partialMatching.pressed = true;
+                Invalidate();
+            }
+
+            return base.ProcessCmdKey(ref msg, keyData);
+        }
+
         #endregion
     }
 }
